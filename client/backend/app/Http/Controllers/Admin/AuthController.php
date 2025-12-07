@@ -33,8 +33,10 @@ class AuthController extends Controller
             return back()->with('error', 'Email hoặc mật khẩu không đúng');
         }
 
-        if ($user->role !== 'admin') {
-            return back()->with('error', 'Bạn không phải là quản trị viên');
+        // Cho phép đăng nhập nếu là admin, tour_manager hoặc hotel_manager
+        $allowed_roles = ['admin', 'tour_manager', 'hotel_manager'];
+        if (!in_array($user->role, $allowed_roles)) {
+            return back()->with('error', 'Bạn không có quyền truy cập trang quản trị');
         }
 
         Auth::login($user);

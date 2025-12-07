@@ -79,6 +79,8 @@
                             <option value="">-- Chọn Role --</option>
                             <option value="user" {{ old('role') === 'user' ? 'selected' : '' }}>User</option>
                             <option value="admin" {{ old('role') === 'admin' ? 'selected' : '' }}>Admin</option>
+                            <option value="tour_manager" {{ old('role') === 'tour_manager' ? 'selected' : '' }}>Tour Manager</option>
+                            <option value="hotel_manager" {{ old('role') === 'hotel_manager' ? 'selected' : '' }}>Hotel Manager</option>
                         </select>
                         @error('role')
                             <small class="text-danger">{{ $message }}</small>

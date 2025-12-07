@@ -8,7 +8,7 @@
     <div class="col-lg-8">
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">Chi tiết: {{ $tour->name }}</h5>
+                <h5 class="mb-0">Chi tiết: {{ $tour->title }}</h5>
                 <div class="gap-2 d-flex">
                     <a href="{{ route('admin.tours.edit', $tour) }}" class="btn btn-warning btn-sm">
                         <i class="bi bi-pencil"></i> Chỉnh sửa
@@ -27,12 +27,7 @@
 
                 <div class="mb-3">
                     <label class="form-label">Tên Tour</label>
-                    <p class="form-control-plaintext fw-bold">{{ $tour->name }}</p>
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label">Slug</label>
-                    <p class="form-control-plaintext">{{ $tour->slug }}</p>
+                    <p class="form-control-plaintext fw-bold">{{ $tour->title }}</p>
                 </div>
 
                 <div class="mb-3">

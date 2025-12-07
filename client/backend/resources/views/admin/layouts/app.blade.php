@@ -227,36 +227,66 @@
 
         <nav class="sidebar-nav">
             <ul class="nav flex-column">
+                <!-- Dashboard - Visible to all roles -->
                 <li class="nav-item">
                     <a href="{{ route('admin.dashboard') }}" class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
                         <i class="bi bi-speedometer2"></i> Dashboard
                     </a>
                 </li>
-                <li class="nav-item">
-                    <a href="{{ route('admin.users.index') }}" class="nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
-                        <i class="bi bi-people"></i> Người dùng
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="{{ route('admin.tours.index') }}" class="nav-link {{ request()->routeIs('admin.tours.*') ? 'active' : '' }}">
-                        <i class="bi bi-pin-map"></i> Tour
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="{{ route('admin.hotels.index') }}" class="nav-link {{ request()->routeIs('admin.hotels.*') || request()->routeIs('admin.hotels.rooms.*') ? 'active' : '' }}">
-                        <i class="bi bi-building"></i> Khách sạn
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="{{ route('admin.blogs.index') }}" class="nav-link {{ request()->routeIs('admin.blogs.*') ? 'active' : '' }}">
-                        <i class="bi bi-newspaper"></i> Blog
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="{{ route('admin.bookings.index') }}" class="nav-link {{ request()->routeIs('admin.bookings.*') ? 'active' : '' }}">
-                        <i class="bi bi-cart-check"></i> Đơn hàng
-                    </a>
-                </li>
+
+                <!-- Users - Admin only -->
+                @if(auth()->user()->role === 'admin')
+                    <li class="nav-item">
+                        <a href="{{ route('admin.users.index') }}" class="nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
+                            <i class="bi bi-people"></i> Người dùng
+                        </a>
+                    </li>
+                @endif
+
+                <!-- Tour - Admin & Tour Manager -->
+                @if(in_array(auth()->user()->role, ['admin', 'tour_manager']))
+                    <li class="nav-item">
+                        <a href="{{ route('admin.tours.index') }}" class="nav-link {{ request()->routeIs('admin.tours.*') ? 'active' : '' }}">
+                            <i class="bi bi-pin-map"></i> Tour
+                        </a>
+                    </li>
+                @endif
+
+                <!-- Hotels - Admin & Hotel Manager -->
+                @if(in_array(auth()->user()->role, ['admin', 'hotel_manager']))
+                    <li class="nav-item">
+                        <a href="{{ route('admin.hotels.index') }}" class="nav-link {{ request()->routeIs('admin.hotels.*') || request()->routeIs('admin.hotels.rooms.*') ? 'active' : '' }}">
+                            <i class="bi bi-building"></i> Khách sạn
+                        </a>
+                    </li>
+                @endif
+
+                <!-- Blog - Admin only -->
+                @if(auth()->user()->role === 'admin')
+                    <li class="nav-item">
+                        <a href="{{ route('admin.blogs.index') }}" class="nav-link {{ request()->routeIs('admin.blogs.*') ? 'active' : '' }}">
+                            <i class="bi bi-newspaper"></i> Blog
+                        </a>
+                    </li>
+                @endif
+
+                <!-- Bookings - Admin only -->
+                @if(auth()->user()->role === 'admin')
+                    <li class="nav-item">
+                        <a href="{{ route('admin.bookings.index') }}" class="nav-link {{ request()->routeIs('admin.bookings.*') ? 'active' : '' }}">
+                            <i class="bi bi-cart-check"></i> Đơn hàng
+                        </a>
+                    </li>
+                @endif
+
+                <!-- Contacts - Admin only -->
+                @if(auth()->user()->role === 'admin')
+                    <li class="nav-item">
+                        <a href="{{ route('admin.contacts.index') }}" class="nav-link {{ request()->routeIs('admin.contacts.*') ? 'active' : '' }}">
+                            <i class="bi bi-envelope"></i> Tin nhắn
+                        </a>
+                    </li>
+                @endif
             </ul>
         </nav>
 

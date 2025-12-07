@@ -84,7 +84,7 @@ export default function Checkout() {
       // Create order first
       const orderData = {
         items: items.map(item => ({
-          id: item.id,
+          id: item.type === 'hotel' ? (item as HotelCartItem).hotelId : (item as TourCartItem).tourId,
           type: item.type,
           name: item.type === 'hotel' ? (item as HotelCartItem).roomName : (item as TourCartItem).tourName,
           quantity: item.quantity,

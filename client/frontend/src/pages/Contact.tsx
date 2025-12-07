@@ -21,6 +21,7 @@ import {
 import Header from '@/components/Header';
 import { toast } from '@/hooks/use-toast';
 import { useTitle } from '@/hooks/useTitle';
+import axiosClient from '@/api/axiosClient';
 
 export default function Contact() {
   useTitle("Liên Hệ");
@@ -31,6 +32,7 @@ export default function Contact() {
     subject: '',
     message: ''
   });
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -40,22 +42,39 @@ export default function Contact() {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Simulate form submission
-    toast({
-      title: "Gửi tin nhắn thành công!",
-      description: "Chúng tôi sẽ phản hồi bạn trong vòng 24 giờ.",
-    });
+    setIsLoading(true);
 
-    // Reset form
-    setFormData({
-      name: '',
-      email: '',
-      phone: '',
-      subject: '',
-      message: ''
-    });
+    try {
+      const response = await axiosClient.post<{ status: boolean; message?: string }>('/contacts', formData);
+      
+      if (response.data.status) {
+        toast({
+          title: "Gửi tin nhắn thành công!",
+          description: "Chúng tôi sẽ phản hồi bạn trong vòng 24 giờ.",
+        });
+
+        // Reset form
+        setFormData({
+          name: '',
+          email: '',
+          phone: '',
+          subject: '',
+          message: ''
+        });
+      }
+    } catch (error: any) {
+      console.error('Contact form error:', error);
+      const errorMessage = error.response?.data?.message || error.message || 'Có lỗi xảy ra. Vui lòng thử lại.';
+      toast({
+        title: "Lỗi",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const contactInfo = [
@@ -196,12 +215,13 @@ export default function Contact() {
                   </div>
 
                   <div>
-                    <label className="text-sm font-medium mb-2 block">Chủ đề</label>
+                    <label className="text-sm font-medium mb-2 block">Chủ đề *</label>
                     <Input
                       name="subject"
                       value={formData.subject}
                       onChange={handleInputChange}
                       placeholder="Chủ đề tin nhắn"
+                      required
                       className="bg-white border-gray-200 text-gray-900"
                     />
                   </div>
@@ -219,9 +239,13 @@ export default function Contact() {
                     />
                   </div>
 
-                  <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700">
+                  <Button 
+                    type="submit" 
+                    disabled={isLoading}
+                    className="w-full bg-blue-600 hover:bg-blue-700"
+                  >
                     <Send className="h-4 w-4 mr-2" />
-                    Gửi Tin Nhắn
+                    {isLoading ? 'Đang gửi...' : 'Gửi Tin Nhắn'}
                   </Button>
                 </form>
               </CardContent>

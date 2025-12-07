@@ -10,12 +10,21 @@ class Hotel extends Model
         'name', 'location', 'description', 'rating',
         'price', 'original_price', 'image', 'images', 'amenities',
         'reviews', 'check_in', 'check_out', 'cancellation', 'children',
+        'address', 'city', 'created_by', 'rooms_count',
     ];
 
     protected $casts = [
         'images' => 'array',
         'amenities' => 'array',
     ];
+
+    /**
+     * Relationship: User who created this hotel
+     */
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
 
     public function rooms()
     {

@@ -9,43 +9,59 @@ use App\Http\Controllers\Admin\BlogController;
 use App\Http\Controllers\Admin\HotelController as AdminHotelController;
 use App\Http\Controllers\Admin\RoomController as AdminRoomController;
 use App\Http\Controllers\Admin\BookingController as AdminBookingController;
+use App\Http\Controllers\Admin\ContactController as AdminContactController;
 
 Route::get('/', function () {
     return view('admin.auth.login');
 });
 
-// ===== ADMIN ROUTES =====
-// Login routes (không cần auth)
+// ===== LOGIN ROUTES (không cần auth) =====
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('login', [AuthController::class, 'showLogin'])->name('login');
     Route::post('login', [AuthController::class, 'login'])->name('login.store');
 });
 
-// Protected admin routes (cần auth và role=admin)
-Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(function () {
+// ===== PROTECTED ADMIN ROUTES (cần auth + admin/tour_manager/hotel_manager role) =====
+Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin_or_manager'])->group(function () {
     // Dashboard
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 
-    // Users management
-    Route::resource('users', UserController::class);
+    // Users management (chỉ admin)
+    Route::middleware('admin')->group(function () {
+        Route::resource('users', UserController::class);
+    });
 
-    // Tours management
-    Route::resource('tours', TourController::class);
+    // Tours management (admin và tour_manager)
+    Route::middleware('admin_or_manager')->group(function () {
+        Route::resource('tours', TourController::class);
+    });
 
-    // Blogs management
-    Route::resource('blogs', BlogController::class);
+    // Blogs management (chỉ admin)
+    Route::middleware('admin')->group(function () {
+        Route::resource('blogs', BlogController::class);
+    });
 
-    // Hotels management
-    Route::resource('hotels', AdminHotelController::class);
+    // Hotels management (admin và hotel_manager)
+    Route::middleware('admin_or_manager')->group(function () {
+        Route::resource('hotels', AdminHotelController::class);
+    });
 
-    // Rooms management
-    Route::resource('hotels.rooms', AdminRoomController::class);
+    // Rooms management (chỉ admin)
+    Route::middleware('admin')->group(function () {
+        Route::resource('hotels.rooms', AdminRoomController::class);
+    });
 
-    // Bookings management
-    Route::get('bookings', [AdminBookingController::class, 'index'])->name('bookings.index');
-    Route::get('bookings/{id}', [AdminBookingController::class, 'show'])->name('bookings.show');
-    Route::put('bookings/{id}/status', [AdminBookingController::class, 'updateStatus'])->name('bookings.updateStatus');
+    // Bookings management (chỉ admin)
+    Route::middleware('admin')->group(function () {
+        Route::get('bookings', [AdminBookingController::class, 'index'])->name('bookings.index');
+        Route::get('bookings/{id}', [AdminBookingController::class, 'show'])->name('bookings.show');
+        Route::put('bookings/{id}/status', [AdminBookingController::class, 'updateStatus'])->name('bookings.updateStatus');
+    });
+
+    // Contacts management (chỉ admin)
+    Route::middleware('admin')->group(function () {
+        Route::resource('contacts', AdminContactController::class);
+    });
 });
-
 

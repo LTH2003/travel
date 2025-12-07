@@ -8,7 +8,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import Header from "@/components/Header";
 import SearchForm, { SearchFilters } from "@/components/SearchForm";
 import TourCard from "@/components/TourCard";
-import { Filter, SlidersHorizontal, X } from "lucide-react";
+import { Filter, SlidersHorizontal, X, ChevronLeft, ChevronRight } from "lucide-react";
 import { useTitle } from "@/hooks/useTitle";
 import { tourApi } from "@/api/tourApi";
 
@@ -34,11 +34,13 @@ export interface Tour {
 export default function Tours() {
   useTitle("Tours - TravelVN");
   const [searchParams, setSearchParams] = useSearchParams();
+  const ITEMS_PER_PAGE = 12; // Show 12 tours per page
 
   const [tours, setTours] = useState<Tour[]>([]);
   const [filteredTours, setFilteredTours] = useState<Tour[]>([]);
   const [loading, setLoading] = useState(true);
   const [showFilters, setShowFilters] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const [selectedDestination, setSelectedDestination] = useState(searchParams.get("destination") || "Tất cả điểm đến");
   const [selectedCategory, setSelectedCategory] = useState("Tất cả");
@@ -59,6 +61,12 @@ export default function Tours() {
     () => ["Tất cả", ...Array.from(new Set(tours.map((t) => t.category)))],
     [tours]
   );
+
+  // Pagination
+  const totalPages = Math.ceil(filteredTours.length / ITEMS_PER_PAGE);
+  const startIdx = (currentPage - 1) * ITEMS_PER_PAGE;
+  const endIdx = startIdx + ITEMS_PER_PAGE;
+  const paginatedTours = filteredTours.slice(startIdx, endIdx);
 
   const formatPrice = (value: number) =>
     new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND", maximumFractionDigits: 0 }).format(value);
@@ -142,6 +150,7 @@ export default function Tours() {
     }
 
     setFilteredTours(filtered);
+    setCurrentPage(1); // Reset to page 1 when filters change
   }, [tours, selectedDestination, selectedCategory, priceRange, selectedDurations, sortBy, keyword]);
 
   const handleSearch = (filters: SearchFilters) => {
@@ -321,25 +330,73 @@ export default function Tours() {
             </div>
 
             {filteredTours.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                {filteredTours.map((tour) => (
-                  <TourCard
-                    key={tour.id}
-                    tour={{
-                      id: tour.id,
-                      title: tour.title,
-                      image: tour.image,
-                      destination: tour.destination,
-                      price: tour.price,
-                      originalPrice: tour.original_price,
-                      duration: tour.duration,
-                      rating: tour.rating,
-                      reviewCount: tour.review_count,
-                      maxGuests: tour.max_guests,
-                    }}
-                  />
-                ))}
-              </div>
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                  {paginatedTours.map((tour) => (
+                    <TourCard
+                      key={tour.id}
+                      tour={{
+                        id: tour.id,
+                        title: tour.title,
+                        image: tour.image,
+                        destination: tour.destination,
+                        price: tour.price,
+                        originalPrice: tour.original_price,
+                        duration: tour.duration,
+                        rating: tour.rating,
+                        reviewCount: tour.review_count,
+                        maxGuests: tour.max_guests,
+                      }}
+                    />
+                  ))}
+                </div>
+
+                {/* Pagination */}
+                {totalPages > 1 && (
+                  <div className="flex items-center justify-center gap-2 mt-8">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                      disabled={currentPage === 1}
+                    >
+                      <ChevronLeft className="h-4 w-4" />
+                    </Button>
+
+                    {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                      let pageNum;
+                      if (totalPages <= 5) {
+                        pageNum = i + 1;
+                      } else if (currentPage <= 3) {
+                        pageNum = i + 1;
+                      } else if (currentPage >= totalPages - 2) {
+                        pageNum = totalPages - 4 + i;
+                      } else {
+                        pageNum = currentPage - 2 + i;
+                      }
+                      return (
+                        <Button
+                          key={pageNum}
+                          variant={currentPage === pageNum ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => setCurrentPage(pageNum)}
+                        >
+                          {pageNum}
+                        </Button>
+                      );
+                    })}
+
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                      disabled={currentPage === totalPages}
+                    >
+                      <ChevronRight className="h-4 w-4" />
+                    </Button>
+                  </div>
+                )}
+              </>
             ) : (
               <div className="text-center py-12">
                 <div className="text-gray-400 mb-4">

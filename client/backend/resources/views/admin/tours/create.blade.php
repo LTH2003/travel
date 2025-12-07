@@ -15,33 +15,17 @@
                     @csrf
 
                     <div class="mb-3">
-                        <label class="form-label" for="name">Tên Tour <span class="text-danger">*</span></label>
+                        <label class="form-label" for="title">Tên Tour <span class="text-danger">*</span></label>
                         <input 
                             type="text" 
-                            class="form-control @error('name') is-invalid @enderror" 
-                            id="name" 
-                            name="name" 
-                            value="{{ old('name') }}"
+                            class="form-control @error('title') is-invalid @enderror" 
+                            id="title" 
+                            name="title" 
+                            value="{{ old('title') }}"
                             placeholder="Nhập tên tour"
                             required
                         >
-                        @error('name')
-                            <small class="text-danger">{{ $message }}</small>
-                        @enderror
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label" for="slug">Slug <span class="text-danger">*</span></label>
-                        <input 
-                            type="text" 
-                            class="form-control @error('slug') is-invalid @enderror" 
-                            id="slug" 
-                            name="slug" 
-                            value="{{ old('slug') }}"
-                            placeholder="tour-name"
-                            required
-                        >
-                        @error('slug')
+                        @error('title')
                             <small class="text-danger">{{ $message }}</small>
                         @enderror
                     </div>
@@ -98,6 +82,26 @@
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
+                                <label class="form-label" for="original_price">Giá gốc (VNĐ)</label>
+                                <input 
+                                    type="number" 
+                                    class="form-control @error('original_price') is-invalid @enderror" 
+                                    id="original_price" 
+                                    name="original_price" 
+                                    value="{{ old('original_price') }}"
+                                    placeholder="0"
+                                    min="0"
+                                >
+                                @error('original_price')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
                                 <label class="form-label" for="duration">Thời gian <span class="text-danger">*</span></label>
                                 <input 
                                     type="text" 
@@ -113,26 +117,44 @@
                                 @enderror
                             </div>
                         </div>
-                    </div>
-
-                    <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label class="form-label" for="image">Hình ảnh (URL)</label>
-                                <input 
-                                    type="text" 
-                                    class="form-control @error('image') is-invalid @enderror" 
-                                    id="image" 
-                                    name="image" 
-                                    value="{{ old('image') }}"
-                                    placeholder="https://..."
+                                <label class="form-label" for="category">Loại Tour <span class="text-danger">*</span></label>
+                                <select 
+                                    class="form-control @error('category') is-invalid @enderror" 
+                                    id="category" 
+                                    name="category"
+                                    required
                                 >
-                                @error('image')
+                                    <option value="">-- Chọn loại tour --</option>
+                                    <option value="trong_nuoc" {{ old('category') === 'trong_nuoc' ? 'selected' : '' }}>Trong nước</option>
+                                    <option value="quoc_te" {{ old('category') === 'quoc_te' ? 'selected' : '' }}>Quốc tế</option>
+                                </select>
+                                @error('category')
                                     <small class="text-danger">{{ $message }}</small>
                                 @enderror
                             </div>
                         </div>
-                        <div class="col-md-6">
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label class="form-label" for="max_guests">Số khách tối đa</label>
+                                <input 
+                                    type="number" 
+                                    class="form-control @error('max_guests') is-invalid @enderror" 
+                                    id="max_guests" 
+                                    name="max_guests" 
+                                    value="{{ old('max_guests') }}"
+                                    min="1"
+                                >
+                                @error('max_guests')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="col-md-3">
                             <div class="mb-3">
                                 <label class="form-label" for="rating">Rating (0-5)</label>
                                 <input 
@@ -146,6 +168,22 @@
                                     step="0.1"
                                 >
                                 @error('rating')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label" for="image">Hình ảnh (URL)</label>
+                                <input 
+                                    type="text" 
+                                    class="form-control @error('image') is-invalid @enderror" 
+                                    id="image" 
+                                    name="image" 
+                                    value="{{ old('image') }}"
+                                    placeholder="https://..."
+                                >
+                                @error('image')
                                     <small class="text-danger">{{ $message }}</small>
                                 @enderror
                             </div>

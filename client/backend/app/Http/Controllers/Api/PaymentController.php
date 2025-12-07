@@ -105,10 +105,14 @@ class PaymentController extends Controller
 
             // Create BookingDetail records from items
             foreach ($items as $item) {
+                // Convert type to proper class name (tour -> Tour, hotel -> Hotel)
+                $itemType = $item['type'] ?? 'tour';
+                $bookableType = ucfirst(strtolower($itemType));
+                
                 BookingDetail::create([
                     'order_id' => $order->id,
                     'bookable_id' => $item['id'] ?? null,
-                    'bookable_type' => strtolower($item['type'] ?? 'tour'),
+                    'bookable_type' => $bookableType,
                     'quantity' => $item['quantity'] ?? 1,
                     'price' => $item['price'] ?? 0,
                     'booking_info' => [

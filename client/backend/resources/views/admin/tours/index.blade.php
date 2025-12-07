@@ -28,7 +28,7 @@
                 @forelse($tours as $tour)
                     <tr>
                         <td><strong>#{{ $tour->id }}</strong></td>
-                        <td>{{ $tour->name }}</td>
+                        <td>{{ $tour->title }}</td>
                         <td>{{ $tour->destination }}</td>
                         <td><strong>{{ number_format($tour->price) }} VNĐ</strong></td>
                         <td>{{ $tour->duration }}</td>

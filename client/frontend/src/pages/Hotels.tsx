@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Star, MapPin, Wifi, Car, Coffee, Utensils, Search, Filter } from 'lucide-react';
+import { Star, MapPin, Wifi, Car, Coffee, Utensils, Search, Filter, ChevronLeft, ChevronRight } from 'lucide-react';
 import Header from '@/components/Header';
 import { hotelApi } from '@/api/hotelApi';
 import { useTitle } from '@/hooks/useTitle';
@@ -40,6 +40,7 @@ const locations = [
 
 export default function Hotels() {
   useTitle("Khách Sạn & Resort");
+  const ITEMS_PER_PAGE = 12;
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedLocation, setSelectedLocation] = useState('');
   const [priceRange, setPriceRange] = useState('');
@@ -47,6 +48,7 @@ export default function Hotels() {
   const [hotels, setHotels] = useState<Hotel[]>(HotelsPlaceholder);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     (async () => {
@@ -89,6 +91,12 @@ export default function Hotels() {
     
     return matchesSearch && matchesLocation && matchesPrice && matchesRating;
   });
+
+  // Pagination
+  const totalPages = Math.ceil(filteredHotels.length / ITEMS_PER_PAGE);
+  const startIdx = (currentPage - 1) * ITEMS_PER_PAGE;
+  const endIdx = startIdx + ITEMS_PER_PAGE;
+  const paginatedHotels = filteredHotels.slice(startIdx, endIdx);
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('vi-VN', {
@@ -191,7 +199,7 @@ export default function Hotels() {
 
               <div>
                 <label className="text-sm font-medium mb-2 block">Đánh giá</label>
-                <Select value={rating} onValueChange={setRating}>
+                <Select value={rating} onValueChange={(val) => { setRating(val); setCurrentPage(1); }}>
                   <SelectTrigger className="bg-white border-gray-200 text-gray-900">
                     <SelectValue placeholder="Chọn sao" />
                   </SelectTrigger>
@@ -211,6 +219,7 @@ export default function Hotels() {
                     setSelectedLocation('');
                     setPriceRange('');
                     setRating('');
+                    setCurrentPage(1);
                   }}
                   variant="outline"
                   className="w-full"
@@ -231,7 +240,7 @@ export default function Hotels() {
 
         {/* Hotels Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredHotels.map((hotel) => (
+          {paginatedHotels.map((hotel) => (
             <Card key={hotel.id} className="overflow-hidden hover:shadow-lg transition-shadow">
               <div className="relative">
                 <img
@@ -296,6 +305,52 @@ export default function Hotels() {
             </Card>
           ))}
         </div>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-center gap-2 mt-8">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+              disabled={currentPage === 1}
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+
+            {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+              let pageNum;
+              if (totalPages <= 5) {
+                pageNum = i + 1;
+              } else if (currentPage <= 3) {
+                pageNum = i + 1;
+              } else if (currentPage >= totalPages - 2) {
+                pageNum = totalPages - 4 + i;
+              } else {
+                pageNum = currentPage - 2 + i;
+              }
+              return (
+                <Button
+                  key={pageNum}
+                  variant={currentPage === pageNum ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setCurrentPage(pageNum)}
+                >
+                  {pageNum}
+                </Button>
+              );
+            })}
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+              disabled={currentPage === totalPages}
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+        )}
 
         {filteredHotels.length === 0 && (
           <div className="text-center py-12">

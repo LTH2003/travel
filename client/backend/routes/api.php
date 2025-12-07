@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\RecommendationController;
 use App\Http\Controllers\Api\PaymentController;
 use App\Http\Controllers\Api\BookingController;
 use App\Http\Controllers\Api\BookingManagementController;
+use App\Http\Controllers\Api\ContactController;
 
 /*
 |--------------------------------------------------------------------------
@@ -41,6 +42,9 @@ Route::post('/auth/resend-otp', [AuthController::class, 'resendOtp']);
 
 // Note: Development-only debug routes (test-token, debug-order) removed.
 // These were gated by APP_DEBUG and have been deleted to clean the codebase.
+
+// 📧 Contact routes (public - no auth needed)
+Route::post('/contacts', [ContactController::class, 'store']);
 
 
 
@@ -336,6 +340,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/bookings/history', [BookingController::class, 'getPurchaseHistory']);
     Route::get('/bookings/history/{purchaseId}', [BookingController::class, 'getPurchaseDetail']);
     Route::get('/bookings/all', [BookingController::class, 'getAllBookings']); // Get all orders (pending + completed)
+});
+
+// 📧 Contact management (admin only)
+Route::middleware(['auth:sanctum', 'admin'])->group(function () {
+    Route::get('/admin/contacts', [ContactController::class, 'index']);
+    Route::get('/admin/contacts/{contact}', [ContactController::class, 'show']);
+    Route::put('/admin/contacts/{contact}', [ContactController::class, 'update']);
+    Route::delete('/admin/contacts/{contact}', [ContactController::class, 'destroy']);
 });
 
 // 📊 Booking management (admin only)

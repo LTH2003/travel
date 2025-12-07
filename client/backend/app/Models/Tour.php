@@ -17,8 +17,16 @@ class Tour extends Model
 ];
 
     protected $fillable = [
-        'name', 'slug', 'destination', 'description', 'price', 'duration', 'image', 'rating'
+        'title', 'destination', 'description', 'price', 'original_price', 'duration', 'image', 'rating', 'created_by', 'category', 'max_guests'
     ];
+
+    /**
+     * Relationship: User who created this tour
+     */
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
 
     public function favorites()
     {
