@@ -21,6 +21,7 @@
                     <th>Giá</th>
                     <th>Thời gian</th>
                     <th>Rating</th>
+                    <th>Người tạo</th>
                     <th>Hành động</th>
                 </tr>
             </thead>
@@ -36,6 +37,14 @@
                             @if($tour->rating)
                                 <i class="bi bi-star-fill" style="color: #ffc107;"></i>
                                 {{ $tour->rating }}/5
+                            @else
+                                <em class="text-muted">N/A</em>
+                            @endif
+                        </td>
+                        <td>
+                            @if($tour->creator)
+                                <span class="badge bg-secondary">{{ $tour->creator->name }}</span><br>
+                                <small class="text-muted">{{ $tour->created_at->format('d/m/Y H:i') }}</small>
                             @else
                                 <em class="text-muted">N/A</em>
                             @endif
@@ -58,7 +67,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="7" class="text-center text-muted py-4">
+                        <td colspan="8" class="text-center text-muted py-4">
                             <i class="bi bi-inbox" style="font-size: 2rem;"></i><br>
                             Chưa có tour nào
                         </td>
