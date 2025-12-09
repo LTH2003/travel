@@ -122,7 +122,7 @@
                     <tbody>
                         @forelse($recentTours as $tour)
                             <tr>
-                                <td><strong>{{ $tour->name }}</strong></td>
+                                <td><strong>{{ $tour->title }}</strong></td>
                                 <td>{{ number_format($tour->price) }} VNĐ</td>
                                 <td>{{ $tour->duration }}</td>
                                 <td>

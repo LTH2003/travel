@@ -146,14 +146,14 @@ export default function Recommendations() {
                     <p className="text-gray-600 text-sm mb-3">{hotel.description}</p>
                     
                     <div className="flex flex-wrap gap-2 mb-4">
-                      {hotel.amenities.slice(0, 3).map((amenity, index) => (
+                      {(hotel.amenities || []).slice(0, 3).map((amenity, index) => (
                         <div key={index} className="flex items-center text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded">
                           {getAmenityIcon(amenity)}
                           <span className="ml-1">{amenity}</span>
                         </div>
                       ))}
-                      {hotel.amenities.length > 3 && (
-                        <span className="text-xs text-gray-500">+{hotel.amenities.length - 3} tiện ích</span>
+                      {(hotel.amenities || []).length > 3 && (
+                        <span className="text-xs text-gray-500">+{(hotel.amenities || []).length - 3} tiện ích</span>
                       )}
                     </div>
                     
