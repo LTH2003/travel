@@ -13,7 +13,7 @@ class ContactController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Contact::query();
+        $query = Contact::with('user');
 
         // Filter by status
         if ($request->filled('status')) {
@@ -47,6 +47,9 @@ class ContactController extends Controller
      */
     public function show(Contact $contact)
     {
+        // Load user relationship
+        $contact->load('user', 'respondedByUser');
+
         // Mark as read if it was new
         if ($contact->status === 'new') {
             try {

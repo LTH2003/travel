@@ -36,6 +36,13 @@
                         <div class="col-md-6">
                             <p class="text-muted mb-1">Từ</p>
                             <h6 class="mb-0">{{ $contact->name }}</h6>
+                            @if($contact->user)
+                                <small class="text-primary">
+                                    <a href="{{ route('admin.users.show', $contact->user->id) }}">
+                                        Xem hồ sơ người dùng →
+                                    </a>
+                                </small>
+                            @endif
                         </div>
                         <div class="col-md-6">
                             <p class="text-muted mb-1">Ngày gửi</p>

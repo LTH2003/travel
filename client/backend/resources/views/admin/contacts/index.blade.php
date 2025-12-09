@@ -109,7 +109,7 @@
                         <thead class="table-light">
                             <tr>
                                 <th>Trạng thái</th>
-                                <th>Tên</th>
+                                <th>Tên người gửi</th>
                                 <th>Email</th>
                                 <th>Số điện thoại</th>
                                 <th>Chủ đề</th>
@@ -135,6 +135,9 @@
                                 <td><strong>{{ $contact->name }}</strong></td>
                                 <td>
                                     <a href="mailto:{{ $contact->email }}">{{ $contact->email }}</a>
+                                    @if($contact->user)
+                                        <br><small class="text-muted">ID User: #{{ $contact->user->id }}</small>
+                                    @endif
                                 </td>
                                 <td>
                                     @if($contact->phone)

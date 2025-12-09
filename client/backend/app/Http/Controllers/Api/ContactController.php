@@ -9,20 +9,35 @@ use Illuminate\Http\Request;
 class ContactController extends Controller
 {
     /**
-     * Store a contact message
+     * Store a contact message (requires authentication via route middleware)
      */
     public function store(Request $request)
     {
         try {
+            // Route middleware ensures user is authenticated
+            $user = $request->user();
+            
+            \Log::info('Contact store - User:', ['user_id' => $user?->id, 'name' => $user?->name]);
+
             $validated = $request->validate([
-                'name' => 'required|string|max:255',
-                'email' => 'required|email|max:255',
-                'phone' => 'nullable|string|max:20',
-                'subject' => 'nullable|string|max:255',
+                'subject' => 'required|string|max:255',
                 'message' => 'required|string|min:10',
             ]);
 
-            $contact = Contact::create($validated);
+            \Log::info('Contact validated:', $validated);
+
+            // Create contact with user info from authenticated user
+            $contact = Contact::create([
+                'user_id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'phone' => $user->phone,
+                'subject' => $validated['subject'],
+                'message' => $validated['message'],
+                'status' => 'new',
+            ]);
+
+            \Log::info('Contact created:', ['id' => $contact->id, 'user_id' => $contact->user_id]);
 
             return response()->json([
                 'status' => true,
@@ -33,6 +48,7 @@ class ContactController extends Controller
             \Log::error('Contact submission error:', [
                 'message' => $e->getMessage(),
                 'request' => $request->all(),
+                'trace' => $e->getTraceAsString(),
             ]);
 
             return response()->json([

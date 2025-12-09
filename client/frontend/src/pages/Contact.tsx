@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -21,18 +22,28 @@ import {
 import Header from '@/components/Header';
 import { toast } from '@/hooks/use-toast';
 import { useTitle } from '@/hooks/useTitle';
+import { useAuth } from '@/hooks/useAuth';
 import axiosClient from '@/api/axiosClient';
 
 export default function Contact() {
   useTitle("Liên Hệ");
+  const navigate = useNavigate();
+  const { user, loading, isLoggedIn } = useAuth();
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
     subject: '',
     message: ''
   });
   const [isLoading, setIsLoading] = useState(false);
+
+  // Debug logging
+  useEffect(() => {
+    console.log('📍 Contact page load:');
+    console.log('  - isLoggedIn:', isLoggedIn);
+    console.log('  - loading:', loading);
+    console.log('  - user:', user);
+    const token = localStorage.getItem('token');
+    console.log('  - token in localStorage:', token ? '✅ ' + token.substring(0, 20) + '...' : '❌ No token');
+  }, [isLoggedIn, loading, user]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -47,7 +58,9 @@ export default function Contact() {
     setIsLoading(true);
 
     try {
+      console.log('📤 Sending contact form:', formData);
       const response = await axiosClient.post<{ status: boolean; message?: string }>('/contacts', formData);
+      console.log('✅ Contact response:', response.data);
       
       if (response.data.status) {
         toast({
@@ -57,15 +70,14 @@ export default function Contact() {
 
         // Reset form
         setFormData({
-          name: '',
-          email: '',
-          phone: '',
           subject: '',
           message: ''
         });
       }
     } catch (error: any) {
-      console.error('Contact form error:', error);
+      console.error('❌ Contact form error:', error);
+      console.error('   Error response:', error.response?.data);
+      console.error('   Error status:', error.response?.status);
       const errorMessage = error.response?.data?.message || error.message || 'Có lỗi xảy ra. Vui lòng thử lại.';
       toast({
         title: "Lỗi",
@@ -164,92 +176,98 @@ export default function Contact() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Contact Form */}
           <div>
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center text-2xl">
-                  <Send className="h-6 w-6 mr-2 text-blue-600" />
-                  Gửi Tin Nhắn
-                </CardTitle>
-                <CardDescription>
-                  Điền thông tin bên dưới và chúng tôi sẽ liên hệ với bạn sớm nhất
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-sm font-medium mb-2 block">Họ và tên *</label>
-                      <Input
-                        name="name"
-                        value={formData.name}
-                        onChange={handleInputChange}
-                        placeholder="Nhập họ và tên"
-                        required
-                        className="bg-white border-gray-200 text-gray-900"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium mb-2 block">Số điện thoại *</label>
-                      <Input
-                        name="phone"
-                        value={formData.phone}
-                        onChange={handleInputChange}
-                        placeholder="Nhập số điện thoại"
-                        required
-                        className="bg-white border-gray-200 text-gray-900"
-                      />
-                    </div>
+            {!loading && !isLoggedIn ? (
+              // Show login prompt if not authenticated
+              <Card className="border-blue-200 bg-blue-50">
+                <CardContent className="p-8 text-center">
+                  <div className="mb-4">
+                    <MessageSquare className="h-12 w-12 text-blue-600 mx-auto" />
                   </div>
-
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">Email *</label>
-                    <Input
-                      name="email"
-                      type="email"
-                      value={formData.email}
-                      onChange={handleInputChange}
-                      placeholder="Nhập địa chỉ email"
-                      required
-                      className="bg-white border-gray-200 text-gray-900"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">Chủ đề *</label>
-                    <Input
-                      name="subject"
-                      value={formData.subject}
-                      onChange={handleInputChange}
-                      placeholder="Chủ đề tin nhắn"
-                      required
-                      className="bg-white border-gray-200 text-gray-900"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">Nội dung *</label>
-                    <Textarea
-                      name="message"
-                      value={formData.message}
-                      onChange={handleInputChange}
-                      placeholder="Nhập nội dung tin nhắn..."
-                      rows={5}
-                      required
-                      className="bg-white border-gray-200 text-gray-900"
-                    />
-                  </div>
-
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                    Vui lòng đăng nhập
+                  </h3>
+                  <p className="text-gray-600 mb-6">
+                    Để gửi tin nhắn cho chúng tôi, bạn cần đăng nhập vào tài khoản của mình.
+                  </p>
                   <Button 
-                    type="submit" 
-                    disabled={isLoading}
+                    onClick={() => navigate('/login')}
                     className="w-full bg-blue-600 hover:bg-blue-700"
                   >
-                    <Send className="h-4 w-4 mr-2" />
-                    {isLoading ? 'Đang gửi...' : 'Gửi Tin Nhắn'}
+                    Đăng Nhập
                   </Button>
-                </form>
-              </CardContent>
-            </Card>
+                  <p className="text-sm text-gray-600 mt-4">
+                    Chưa có tài khoản? <a href="/register" className="text-blue-600 hover:underline">Đăng ký ngay</a>
+                  </p>
+                </CardContent>
+              </Card>
+            ) : loading ? (
+              // Show loading state
+              <Card>
+                <CardContent className="p-8 text-center">
+                  <div className="animate-spin h-8 w-8 border-4 border-blue-600 border-t-transparent rounded-full mx-auto"></div>
+                </CardContent>
+              </Card>
+            ) : (
+              // Show contact form
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center text-2xl">
+                    <Send className="h-6 w-6 mr-2 text-blue-600" />
+                    Gửi Tin Nhắn
+                  </CardTitle>
+                  <CardDescription>
+                    Chỉ cần nhập chủ đề và nội dung, thông tin của bạn sẽ được tự động điền
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <form onSubmit={handleSubmit} className="space-y-4">
+                    {/* Display user info */}
+                    <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                      <p className="text-sm text-gray-600">Gửi từ tài khoản:</p>
+                      <p className="font-semibold text-gray-900">{user?.name}</p>
+                      <p className="text-sm text-gray-600">{user?.email}</p>
+                      {user?.phone && <p className="text-sm text-gray-600">{user?.phone}</p>}
+                    </div>
+
+                    {/* Subject field */}
+                    <div>
+                      <label className="text-sm font-medium mb-2 block">Chủ đề *</label>
+                      <Input
+                        name="subject"
+                        value={formData.subject}
+                        onChange={handleInputChange}
+                        placeholder="Nhập chủ đề tin nhắn"
+                        required
+                        className="bg-white border-gray-200 text-gray-900"
+                      />
+                    </div>
+
+                    {/* Message field */}
+                    <div>
+                      <label className="text-sm font-medium mb-2 block">Nội dung *</label>
+                      <Textarea
+                        name="message"
+                        value={formData.message}
+                        onChange={handleInputChange}
+                        placeholder="Nhập nội dung tin nhắn..."
+                        rows={5}
+                        required
+                        className="bg-white border-gray-200 text-gray-900"
+                      />
+                    </div>
+
+                    <Button 
+                      type="submit" 
+                      disabled={isLoading}
+                      className="w-full bg-blue-600 hover:bg-blue-700"
+                    >
+                      <Send className="h-4 w-4 mr-2" />
+                      {isLoading ? 'Đang gửi...' : 'Gửi Tin Nhắn'}
+                    </Button>
+                  </form>
+                </CardContent>
+              </Card>
+            )}
           </div>
 
           {/* Contact Information */}

@@ -50,9 +50,10 @@ Route::post('/auth/resend-otp', [AuthController::class, 'resendOtp']);
 // Note: Development-only debug routes (test-token, debug-order) removed.
 // These were gated by APP_DEBUG and have been deleted to clean the codebase.
 
-// 📧 Contact routes (public - no auth needed)
-Route::post('/contacts', [ContactController::class, 'store']);
-
+// 📧 Contact routes (requires authentication)
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/contacts', [ContactController::class, 'store']);
+});
 
 
 // 🔐 Protected routes (cần đăng nhập)
