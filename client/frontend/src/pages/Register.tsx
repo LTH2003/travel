@@ -8,6 +8,7 @@ import { Separator } from '@/components/ui/separator';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Eye, EyeOff, Mail, Lock, User, Phone, Calendar, Plane, Facebook, Chrome } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
+import { register } from '@/api/auth';
 
 export default function Register() {
   const navigate = useNavigate();
@@ -107,26 +108,35 @@ export default function Register() {
     
     setIsLoading(true);
 
-    // Simulate API call
-    setTimeout(() => {
-      // Simulate successful registration
-      const userData = {
+    try {
+      const fullName = `${formData.firstName} ${formData.lastName}`;
+      
+      const res = await register({
+        name: fullName,
         email: formData.email,
-        name: `${formData.firstName} ${formData.lastName}`,
-        phone: formData.phone,
-        isLoggedIn: true
-      };
-      
-      localStorage.setItem('user', JSON.stringify(userData));
-      
+        password: formData.password,
+        password_confirmation: formData.confirmPassword,
+      });
+
       toast({
         title: "Đăng ký thành công!",
         description: `Chào mừng ${formData.firstName} đến với TravelVN!`,
       });
       
       navigate('/');
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || 
+                          error.response?.data?.errors?.[0] ||
+                          'Đăng ký thất bại. Vui lòng thử lại.';
+      
+      toast({
+        title: "Đăng ký thất bại",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    } finally {
       setIsLoading(false);
-    }, 2000);
+    }
   };
 
   const handleSocialRegister = (provider: string) => {
