@@ -1,5 +1,5 @@
 import { useParams, Link } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -23,12 +23,16 @@ export default function BlogDetail() {
   const [post, setPost] = useState<any | null>(null);
   const [relatedPosts, setRelatedPosts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const viewIncrementedRef = useRef(false); // 🔔 Dùng useRef để tracking view increment
   const [error, setError] = useState<string | null>(null);
+  const [viewIncremented, setViewIncremented] = useState(false); // 🔔 Để chỉ increment một lần
 
   // 📡 Gọi API để lấy bài viết chi tiết
   useEffect(() => {
     setLoading(true);
     setError(null);
+    // Reset flag khi slug thay đổi
+    viewIncrementedRef.current = false;
 
     blogApi
       .getAll() // Gọi toàn bộ bài viết (vì backend chưa có API getBySlug)
@@ -37,6 +41,14 @@ export default function BlogDetail() {
         const currentPost = data.find((p) => p.slug === slug);
         if (currentPost) {
           setPost(currentPost);
+
+          // 📈 Tăng view count chỉ một lần duy nhất khi xem bài viết
+          if (!viewIncrementedRef.current) {
+            viewIncrementedRef.current = true;
+            blogApi.incrementViewBySlug(slug).catch((err) => {
+              console.warn("Failed to increment view count:", err);
+            });
+          }
 
           // Lấy các bài viết liên quan
           const related = data

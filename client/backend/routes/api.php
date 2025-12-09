@@ -29,6 +29,8 @@ use App\Http\Controllers\Api\ContactController;
 // 🌐 Public routes (không cần token)
 Route::get('/blog', [BlogController::class, 'index']);
 Route::get('/blog/{id}', [BlogController::class, 'show']);
+Route::post('/blog/{id}/increment-view', [BlogController::class, 'incrementView']); // 📈 Tăng view
+Route::post('/blog/slug/{slug}/increment-view', [BlogController::class, 'incrementViewBySlug']); // 📈 Tăng view theo slug
 
 Route::get('/tours', [TourController::class, 'index']);
 Route::get('/tours/{id}', [TourController::class, 'show']);

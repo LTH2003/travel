@@ -94,4 +94,38 @@ class BlogController extends Controller
         $blog->delete();
         return response()->json(['message' => 'Blog đã được xóa thành công']);
     }
+
+    // 📈 Tăng view count khi ai xem bài viết
+    public function incrementView($id)
+    {
+        $blog = Blog::find($id);
+        if (!$blog) {
+            return response()->json(['message' => 'Blog không tồn tại'], 404);
+        }
+
+        // Tăng view lên 1
+        $blog->increment('views');
+
+        return response()->json([
+            'message' => 'View count đã được cập nhật',
+            'views' => $blog->views
+        ]);
+    }
+
+    // 📈 Tăng view count bằng slug
+    public function incrementViewBySlug($slug)
+    {
+        $blog = Blog::where('slug', $slug)->first();
+        if (!$blog) {
+            return response()->json(['message' => 'Blog không tồn tại'], 404);
+        }
+
+        // Tăng view lên 1
+        $blog->increment('views');
+
+        return response()->json([
+            'message' => 'View count đã được cập nhật',
+            'views' => $blog->views
+        ]);
+    }
 }
