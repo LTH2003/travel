@@ -16,6 +16,7 @@ use App\Http\Controllers\Api\PaymentController;
 use App\Http\Controllers\Api\BookingController;
 use App\Http\Controllers\Api\BookingManagementController;
 use App\Http\Controllers\Api\ContactController;
+use App\Http\Controllers\Api\TourReviewController;
 
 /*
 |--------------------------------------------------------------------------
@@ -39,6 +40,9 @@ Route::get('/blog-comments/slug/{slug}', [BlogCommentController::class, 'getComm
 
 Route::get('/tours', [TourController::class, 'index']);
 Route::get('/tours/{id}', [TourController::class, 'show']);
+
+// ⭐ Tour Reviews routes (public GET)
+Route::get('/tours/{tourId}/reviews', [TourReviewController::class, 'getReviews']);
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
@@ -83,6 +87,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/blog-comments/{blogId}', [BlogCommentController::class, 'store']);
     Route::put('/blog-comments/{commentId}', [BlogCommentController::class, 'update']);
     Route::delete('/blog-comments/{commentId}', [BlogCommentController::class, 'destroy']);
+    
+    // ⭐ Tour Reviews routes (protected)
+    Route::post('/tours/{tourId}/reviews', [TourReviewController::class, 'store']);
+    Route::put('/reviews/{reviewId}', [TourReviewController::class, 'update']);
+    Route::delete('/reviews/{reviewId}', [TourReviewController::class, 'destroy']);
     
     // Recommendation routes
     Route::get('/recommendations', [RecommendationController::class, 'getRecommendations']);

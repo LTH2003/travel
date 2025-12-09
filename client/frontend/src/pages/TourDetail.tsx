@@ -22,6 +22,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import Header from "@/components/Header";
+import TourReviews from "@/components/TourReviews";
 import { tourApi } from "@/api/tourApi"; // ✅ sử dụng API
 import {
   Star,
@@ -62,13 +63,17 @@ export default function TourDetail() {
   });
 
   // ✅ Gọi API để lấy tour theo ID
-  useEffect(() => {
+  const loadTour = () => {
     if (id) {
       tourApi
         .getById(Number(id))
         .then((res) => setTour(res.data))
         .catch((err) => console.error("Lỗi tải tour:", err));
     }
+  };
+
+  useEffect(() => {
+    loadTour();
   }, [id]);
 
   // Load favorites when tour is loaded
@@ -351,20 +356,7 @@ export default function TourDetail() {
               </TabsContent>
 
               <TabsContent value="reviews">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center">
-                      <MessageCircle className="h-5 w-5 mr-2" />
-                      Đánh giá từ khách hàng
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-center py-8 text-gray-500">
-                      <MessageCircle className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-                      <p>Chức năng đánh giá sẽ được cập nhật sớm</p>
-                    </div>
-                  </CardContent>
-                </Card>
+                <TourReviews tourId={tour.id} tourTitle={tour.title} onReviewAdded={loadTour} />
               </TabsContent>
             </Tabs>
           </div>
