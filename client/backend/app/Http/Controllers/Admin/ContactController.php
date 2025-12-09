@@ -117,6 +117,54 @@ class ContactController extends Controller
     }
 
     /**
+     * Send reply email to contact
+     */
+    public function sendReplyEmail(Request $request, Contact $contact)
+    {
+        $validated = $request->validate([
+            'reply_message' => 'required|string|min:5',
+        ]);
+
+        try {
+            $customerName = $contact->name;
+            $customerEmail = $contact->email;
+            $message = $validated['reply_message'];
+
+            // Send email
+            Mail::send([], [], function ($mail) use ($customerName, $customerEmail, $message, $contact) {
+                $mail->from(config('mail.from.address'), config('mail.from.name'))
+                     ->to($customerEmail)
+                     ->subject('Phản hồi từ Travel App - ' . $contact->subject)
+                     ->html(
+                        "<p>Xin chào <strong>{$customerName}</strong>,</p>" .
+                        "<p>Cảm ơn bạn đã liên hệ với chúng tôi!</p>" .
+                        "<p>Dưới đây là phản hồi từ đội ngũ Travel App:</p>" .
+                        "<hr>" .
+                        "<div style='background-color: #f5f5f5; padding: 15px; border-left: 4px solid #007bff;'>" .
+                        "<p style='white-space: pre-wrap;'>" . htmlspecialchars($message) . "</p>" .
+                        "</div>" .
+                        "<hr>" .
+                        "<p>Nếu bạn có bất kỳ câu hỏi nào khác, vui lòng liên hệ lại.</p>" .
+                        "<p>Trân trọng,<br><strong>Đội ngũ Travel App</strong></p>"
+                     );
+            });
+
+            // Update contact status
+            $contact->update([
+                'status' => 'replied',
+                'response' => $message,
+                'responded_by' => auth()->user()->id,
+                'responded_at' => now(),
+            ]);
+
+            return redirect()->back()->with('success', 'Email phản hồi đã gửi thành công tới ' . $customerEmail);
+        } catch (\Exception $e) {
+            \Log::error('Error sending contact reply email:', ['error' => $e->getMessage()]);
+            return redirect()->back()->with('error', 'Lỗi khi gửi email: ' . $e->getMessage());
+        }
+    }
+
+    /**
      * Send cancellation email with refund notification
      */
     public function sendCancellationEmail(Request $request, Contact $contact)
@@ -161,5 +209,4 @@ class ContactController extends Controller
             return redirect()->back()->with('error', 'Lỗi khi gửi email: ' . $e->getMessage());
         }
     }
-
 }

@@ -69,6 +69,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin_or_manager'])
     Route::middleware('admin')->group(function () {
         Route::resource('contacts', AdminContactController::class);
         Route::post('contacts/{contact}/send-cancellation-email', [AdminContactController::class, 'sendCancellationEmail'])->name('contacts.send-cancellation-email');
+        Route::post('contacts/{contact}/send-reply-email', [AdminContactController::class, 'sendReplyEmail'])->name('contacts.send-reply-email');
     });
 });
 

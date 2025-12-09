@@ -138,9 +138,9 @@
                     <h5 class="mb-0">Hành động nhanh</h5>
                 </div>
                 <div class="card-body">
-                    <a href="mailto:{{ $contact->email }}" class="btn btn-primary w-100 mb-2">
-                        <i class="fas fa-reply me-2"></i>Trả lời qua Email
-                    </a>
+                    <button type="button" class="btn btn-info w-100 mb-2" data-bs-toggle="modal" data-bs-target="#replyEmailModal">
+                        <i class="fas fa-envelope me-2"></i>Trả Lời Qua Email (Soạn)
+                    </button>
                     @if($contact->phone)
                     <a href="tel:{{ $contact->phone }}" class="btn btn-info w-100 mb-2">
                         <i class="fas fa-phone me-2"></i>Gọi điện
@@ -152,7 +152,7 @@
                     
                     <!-- Cancellation Email Button -->
                     <button type="button" class="btn btn-danger w-100 mt-2" data-bs-toggle="modal" data-bs-target="#cancellationModal" 
-                            @if($contact->status === 'replied') disabled @endif>
+                            @if($contact->status === 'replied')  @endif>
                         <i class="fas fa-envelope me-2"></i>Gửi Email Hủy Đơn
                     </button>
                 </div>
@@ -192,6 +192,56 @@
                     </dl>
                 </div>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- Reply Email Modal -->
+<div class="modal fade" id="replyEmailModal" tabindex="-1" aria-labelledby="replyEmailLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title" id="replyEmailLabel">
+                    <i class="fas fa-envelope me-2"></i>Trả Lời Email
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{{ route('admin.contacts.send-reply-email', $contact->id) }}" method="POST">
+                @csrf
+                <div class="modal-body">
+                    <p class="text-muted mb-3">
+                        Gửi email tới: <strong>{{ $contact->email }}</strong>
+                    </p>
+                    
+                    <div class="mb-3">
+                        <label for="reply_message" class="form-label">Nội Dung Phản Hồi <span class="text-danger">*</span></label>
+                        <textarea 
+                            class="form-control @error('reply_message') is-invalid @enderror" 
+                            id="reply_message" 
+                            name="reply_message" 
+                            rows="6" 
+                            placeholder="Nhập nội dung phản hồi..."
+                            required
+                        ></textarea>
+                        @error('reply_message')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="alert alert-light" role="alert">
+                        <small class="text-muted">
+                            <i class="fas fa-info-circle me-1"></i> 
+                            Tiêu đề: <strong>{{ $contact->subject }}</strong>
+                        </small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-info">
+                        <i class="fas fa-paper-plane me-2"></i>Gửi Email
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
