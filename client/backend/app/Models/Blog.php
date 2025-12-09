@@ -29,4 +29,10 @@ class Blog extends Model
         'tags' => 'array',
         'published_at' => 'datetime',
     ];
+
+    // Relationships
+    public function comments()
+    {
+        return $this->hasMany(BlogComment::class);
+    }
 }

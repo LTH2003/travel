@@ -15,6 +15,7 @@ import {
   Tag,
 } from "lucide-react";
 import Header from "@/components/Header";
+import BlogComments from "@/components/BlogComments";
 import { blogApi } from "@/api/blogApi";
 import { toast } from "@/hooks/use-toast";
 
@@ -23,6 +24,7 @@ export default function BlogDetail() {
   const [post, setPost] = useState<any | null>(null);
   const [relatedPosts, setRelatedPosts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentUser, setCurrentUser] = useState<any | null>(null);
   const viewIncrementedRef = useRef(false); // 🔔 Dùng useRef để tracking view increment
   const [error, setError] = useState<string | null>(null);
   const [viewIncremented, setViewIncremented] = useState(false); // 🔔 Để chỉ increment một lần
@@ -33,6 +35,18 @@ export default function BlogDetail() {
     setError(null);
     // Reset flag khi slug thay đổi
     viewIncrementedRef.current = false;
+
+    // Get current user from localStorage
+    const token = localStorage.getItem("token");
+    if (token) {
+      try {
+        // You can optionally fetch user data from API
+        // For now, we'll assume token existence means user is logged in
+        setCurrentUser({ logged_in: true });
+      } catch (err) {
+        console.warn("Could not load user:", err);
+      }
+    }
 
     blogApi
       .getAll() // Gọi toàn bộ bài viết (vì backend chưa có API getBySlug)
@@ -244,6 +258,13 @@ export default function BlogDetail() {
                     ))}
                   </div>
                 )}
+              </CardContent>
+            </Card>
+
+            {/* Comments Section */}
+            <Card className="mt-8">
+              <CardContent className="p-6">
+                <BlogComments blogId={post.id} currentUser={currentUser} />
               </CardContent>
             </Card>
           </div>

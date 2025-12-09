@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BlogController;
+use App\Http\Controllers\Api\BlogCommentController;
 use App\Http\Controllers\Api\TourController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\HotelController;
@@ -31,6 +32,10 @@ Route::get('/blog', [BlogController::class, 'index']);
 Route::get('/blog/{id}', [BlogController::class, 'show']);
 Route::post('/blog/{id}/increment-view', [BlogController::class, 'incrementView']); // 📈 Tăng view
 Route::post('/blog/slug/{slug}/increment-view', [BlogController::class, 'incrementViewBySlug']); // 📈 Tăng view theo slug
+
+// 📝 Blog Comments routes (public GET, protected POST/PUT/DELETE)
+Route::get('/blog-comments/{blogId}', [BlogCommentController::class, 'getComments']);
+Route::get('/blog-comments/slug/{slug}', [BlogCommentController::class, 'getCommentsBySlug']);
 
 Route::get('/tours', [TourController::class, 'index']);
 Route::get('/tours/{id}', [TourController::class, 'show']);
@@ -72,6 +77,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/favorites', [FavoriteController::class, 'store']);
     Route::delete('/favorites', [FavoriteController::class, 'destroy']);
     Route::post('/favorites/check', [FavoriteController::class, 'check']);
+    
+    // 📝 Blog Comments routes (protected)
+    Route::post('/blog-comments/{blogId}', [BlogCommentController::class, 'store']);
+    Route::put('/blog-comments/{commentId}', [BlogCommentController::class, 'update']);
+    Route::delete('/blog-comments/{commentId}', [BlogCommentController::class, 'destroy']);
     
     // Recommendation routes
     Route::get('/recommendations', [RecommendationController::class, 'getRecommendations']);

@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\TourController;
 use App\Http\Controllers\Admin\BlogController;
+use App\Http\Controllers\Admin\BlogCommentController;
 use App\Http\Controllers\Admin\HotelController as AdminHotelController;
 use App\Http\Controllers\Admin\RoomController as AdminRoomController;
 use App\Http\Controllers\Admin\BookingController as AdminBookingController;
@@ -40,6 +41,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin_or_manager'])
     // Blogs management (chỉ admin)
     Route::middleware('admin')->group(function () {
         Route::resource('blogs', BlogController::class);
+        Route::resource('blog-comments', BlogCommentController::class);
+        Route::post('blog-comments/approve-bulk', [BlogCommentController::class, 'approveBulk'])->name('blog-comments.approve-bulk');
+        Route::post('blog-comments/reject-bulk', [BlogCommentController::class, 'rejectBulk'])->name('blog-comments.reject-bulk');
+        Route::post('blog-comments/delete-bulk', [BlogCommentController::class, 'deleteBulk'])->name('blog-comments.delete-bulk');
     });
 
     // Hotels management (admin và hotel_manager)

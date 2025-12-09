@@ -268,6 +268,11 @@
                             <i class="bi bi-newspaper"></i> Blog
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a href="{{ route('admin.blog-comments.index') }}" class="nav-link {{ request()->routeIs('admin.blog-comments.*') ? 'active' : '' }}">
+                            <i class="bi bi-chat-left-text"></i> Bình luận Blog
+                        </a>
+                    </li>
                 @endif
 
                 <!-- Bookings - Admin only -->
