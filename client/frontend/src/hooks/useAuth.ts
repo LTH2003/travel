@@ -21,6 +21,7 @@ export function useAuth() {
             const parsed = JSON.parse(cachedUser);
             setUser(parsed);
             setIsLoggedIn(true);
+            // Don't set loading to false yet - wait for API call
           } catch (e) {
             // Invalid cache
           }
@@ -33,17 +34,22 @@ export function useAuth() {
           return;
         }
 
-        // Fetch fresh data from server
+        // Fetch fresh data from server with timeout
         try {
-          const [userRes] = await Promise.all([
-            getCurrentUser(),
-            loadFromServer().catch(() => null), // Don't fail if cart loading fails
-          ]);
+          // Create abort controller with 5 second timeout
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 5000);
+          
+          const userRes = await getCurrentUser();
+          clearTimeout(timeoutId);
           
           setUser(userRes);
           setIsLoggedIn(true);
           // Update cache
           localStorage.setItem("user", JSON.stringify(userRes));
+          
+          // Load cart in background without blocking
+          loadFromServer().catch(() => null);
         } catch (err) {
           console.error("❌ Không thể lấy thông tin user:", err);
           localStorage.removeItem("token");
