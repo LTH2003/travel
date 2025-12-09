@@ -112,6 +112,6 @@ class ContactController extends Controller
     {
         $contact->delete();
 
-        return redirect()->back()->with('success', 'Xóa tin nhắn thành công');
+        return redirect()->route('admin.contacts.index')->with('success', 'Xóa tin nhắn thành công');
     }
 }

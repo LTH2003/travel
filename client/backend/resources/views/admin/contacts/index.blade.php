@@ -168,11 +168,16 @@
                                             <i class="fas fa-edit"></i>
                                         </button>
                                         @endif
-                                        <button type="button" class="btn btn-sm btn-outline-danger delete-btn"
-                                                data-url="{{ route('admin.contacts.destroy', $contact->id) }}"
-                                                title="Xóa">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
+                                        <form method="POST" action="{{ route('admin.contacts.destroy', $contact->id) }}" 
+                                              style="display: inline;"
+                                              onsubmit="return confirm('Bạn có chắc chắn muốn xóa tin nhắn này?');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-sm btn-outline-danger"
+                                                    title="Xóa">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
                                     </div>
                                 </td>
                             </tr>
@@ -232,19 +237,43 @@
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Delete confirmation
-    document.querySelectorAll('.delete-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            if (confirm('Bạn có chắc chắn muốn xóa tin nhắn này?')) {
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = this.dataset.url;
-                form.innerHTML = '@csrf @method("DELETE")';
-                document.body.appendChild(form);
-                form.submit();
-            }
+    console.log('✅ Contact management script loaded');
+    
+    // Update status form submission
+    const updateStatusForm = document.getElementById('updateStatusForm');
+    if (updateStatusForm) {
+        updateStatusForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const contactId = document.getElementById('contactId').value;
+            const status = document.getElementById('status').value;
+            
+            console.log('📝 Updating contact:', contactId, 'to status:', status);
+            
+            // Submit via fetch
+            fetch(`/admin/contacts/${contactId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                },
+                body: JSON.stringify({ status })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('✅ Response:', data);
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Cập nhật thất bại');
+                }
+            })
+            .catch(err => {
+                console.error('❌ Error:', err);
+                alert('Có lỗi xảy ra');
+            });
         });
-    });
+    }
+});
 
     // Update status form submission
     const updateStatusForm = document.getElementById('updateStatusForm');

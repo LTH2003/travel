@@ -113,17 +113,17 @@
                                         <i class="fas fa-save me-2"></i>Lưu & Cập nhật
                                     </button>
                                     @endif
-                                    
-                                    <form method="POST" action="{{ route('admin.contacts.destroy', $contact->id) }}" 
-                                          class="d-inline"
-                                          onsubmit="return confirm('Bạn có chắc chắn muốn xóa tin nhắn này?')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-danger">
-                                            <i class="fas fa-trash me-2"></i>Xóa tin nhắn
-                                        </button>
-                                    </form>
                                 </div>
+                            </form>
+
+                            <!-- Delete Form -->
+                            <form method="POST" action="{{ route('admin.contacts.destroy', $contact->id) }}"
+                                  onsubmit="return confirm('Bạn có chắc chắn muốn xóa tin nhắn này?')">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-danger mt-2">
+                                    <i class="fas fa-trash me-2"></i>Xóa tin nhắn
+                                </button>
                             </form>
                         </div>
                     </div>
