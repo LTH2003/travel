@@ -31,7 +31,7 @@ return new class extends Migration
         if (Schema::hasTable('tours')) {
             Schema::table('tours', function (Blueprint $table) {
                 if (Schema::hasColumn('tours', 'created_by')) {
-                    $table->dropForeignIdFor('tours', 'created_by');
+                    $table->dropForeign(['created_by']);
                     $table->dropColumn('created_by');
                 }
             });
@@ -40,7 +40,7 @@ return new class extends Migration
         if (Schema::hasTable('hotels')) {
             Schema::table('hotels', function (Blueprint $table) {
                 if (Schema::hasColumn('hotels', 'created_by')) {
-                    $table->dropForeignIdFor('hotels', 'created_by');
+                    $table->dropForeign(['created_by']);
                     $table->dropColumn('created_by');
                 }
             });

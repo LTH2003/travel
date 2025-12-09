@@ -12,7 +12,12 @@ return new class extends Migration
             // Add default values to required columns
             $table->string('category')->default('general')->change();
             $table->decimal('original_price', 10, 2)->nullable()->default(null)->change();
-            $table->integer('review_count')->default(0)->change();
+            
+            // Only modify review_count if it exists
+            if (Schema::hasColumn('tours', 'review_count')) {
+                $table->integer('review_count')->default(0)->change();
+            }
+            
             $table->json('highlights')->default(json_encode([]))->change();
             $table->json('includes')->default(json_encode([]))->change();
             $table->json('itinerary')->default(json_encode([]))->change();
