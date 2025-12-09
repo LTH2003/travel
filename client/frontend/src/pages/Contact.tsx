@@ -20,6 +20,7 @@ import {
   Twitter
 } from 'lucide-react';
 import Header from '@/components/Header';
+import Footer from '@/components/Footer';
 import { toast } from '@/hooks/use-toast';
 import { useTitle } from '@/hooks/useTitle';
 import { useAuth } from '@/hooks/useAuth';
@@ -379,6 +380,7 @@ export default function Contact() {
           </Card>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }

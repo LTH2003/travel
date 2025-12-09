@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, MapPin, Star, Trash2, Heart } from 'lucide-react';
 import Header from '@/components/Header';
+import Footer from '@/components/Footer';
 import { useTitle } from '@/hooks/useTitle';
 import { useAuth } from '@/hooks/useAuth';
 import { useFavorites } from '@/hooks/useFavorites';
@@ -291,8 +292,9 @@ export default function Favorites() {
                 </div>
               </div>
             )}
-          </>
+        </>
         )}
+        <Footer />
       </div>
     </div>
   );

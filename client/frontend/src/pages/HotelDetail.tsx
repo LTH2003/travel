@@ -9,6 +9,8 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
 import { 
   Star, 
   MapPin, 
@@ -31,7 +33,6 @@ import {
   AlertCircle,
   Heart
 } from 'lucide-react';
-import Header from '@/components/Header';
 import { hotelApi } from '@/api/hotelApi';
 import { useEffect } from 'react';
 import { format } from 'date-fns';
@@ -798,6 +799,7 @@ export default function HotelDetail() {
         </div>
       </div>
       )}
+      <Footer />
     </div>
   );
 }

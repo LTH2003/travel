@@ -19,6 +19,7 @@ import {
   Tag,
 } from "lucide-react";
 import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 import { blogApi } from "@/api/blogApi";
 import { useTitle } from "@/hooks/useTitle";
 
@@ -52,12 +53,16 @@ export default function Blog() {
   const filteredPosts = useMemo(() => {
     return blogs
       .filter((post) => {
-        const matchesSearch =
-          post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          post.excerpt?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          post.tags?.some((tag: string) =>
-            tag.toLowerCase().includes(searchTerm.toLowerCase())
-          );
+        // Nếu có searchTerm thì filter, nếu không thì show tất cả
+        let matchesSearch = true;
+        if (searchTerm.trim()) {
+          matchesSearch =
+            post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            post.excerpt?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            post.tags?.some((tag: string) =>
+              tag.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+        }
 
         const matchesCategory =
           selectedCategory === "Tất cả" || post.category === selectedCategory;
@@ -188,7 +193,25 @@ export default function Blog() {
               </h2>
             </div>
 
+            {/* Loading State */}
+            {loading && (
+              <div className="text-center py-12">
+                <div className="inline-block">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+                </div>
+                <p className="text-gray-600 mt-4">Đang tải bài viết...</p>
+              </div>
+            )}
+
+            {/* Error State */}
+            {error && !loading && (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
+                <p className="text-red-600 font-semibold">Lỗi: {error}</p>
+              </div>
+            )}
+
             {/* Blog List */}
+            {!loading && !error && filteredPosts.length > 0 && (
             <div className="space-y-6">
               {filteredPosts.map((post) => (
                 <Card
@@ -253,8 +276,9 @@ export default function Blog() {
                 </Card>
               ))}
             </div>
+            )}
 
-            {filteredPosts.length === 0 && (
+            {filteredPosts.length === 0 && !loading && (
               <div className="text-center py-12">
                 <Search className="h-16 w-16 text-gray-400 mx-auto mb-4" />
                 <h3 className="text-xl font-semibold text-gray-600 mb-2">
@@ -307,6 +331,7 @@ export default function Blog() {
           </div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }

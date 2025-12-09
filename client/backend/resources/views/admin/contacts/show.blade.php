@@ -149,6 +149,12 @@
                     <a href="{{ route('admin.contacts.index') }}" class="btn btn-secondary w-100">
                         <i class="fas fa-list me-2"></i>Quay lại danh sách
                     </a>
+                    
+                    <!-- Cancellation Email Button -->
+                    <button type="button" class="btn btn-danger w-100 mt-2" data-bs-toggle="modal" data-bs-target="#cancellationModal" 
+                            @if($contact->status === 'replied') disabled @endif>
+                        <i class="fas fa-envelope me-2"></i>Gửi Email Hủy Đơn
+                    </button>
                 </div>
             </div>
 
@@ -186,6 +192,67 @@
                     </dl>
                 </div>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- Cancellation Modal -->
+<div class="modal fade" id="cancellationModal" tabindex="-1" aria-labelledby="cancellationModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="cancellationModalLabel">
+                    <i class="fas fa-trash me-2"></i>Gửi Email Hủy Đơn Hàng
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" action="{{ route('admin.contacts.send-cancellation-email', $contact->id) }}">
+                @csrf
+                <div class="modal-body">
+                    <div class="alert alert-info">
+                        <strong>Thông tin khách hàng:</strong><br>
+                        Tên: <strong>{{ $contact->name }}</strong><br>
+                        Email: <strong>{{ $contact->email }}</strong>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="refund_amount" class="form-label">
+                            <i class="fas fa-money-bill-wave me-2"></i>Số tiền hoàn lại (VND)
+                        </label>
+                        <input type="number" class="form-control @error('refund_amount') is-invalid @enderror" 
+                               id="refund_amount" name="refund_amount" min="0" step="1000" required 
+                               placeholder="Ví dụ: 1000000">
+                        @error('refund_amount')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="cancellation_reason" class="form-label">
+                            <i class="fas fa-comments me-2"></i>Lý do hủy đơn
+                        </label>
+                        <textarea class="form-control @error('cancellation_reason') is-invalid @enderror" 
+                                  id="cancellation_reason" name="cancellation_reason" rows="4" 
+                                  placeholder="Nhập lý do hủy đơn cho khách hàng..." required
+                                  minlength="10"></textarea>
+                        <small class="form-text text-muted">Tối thiểu 10 ký tự</small>
+                        @error('cancellation_reason')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="alert alert-warning">
+                        <strong>⚠️ Thông báo:</strong><br>
+                        Tiền hoàn sẽ được gửi về tài khoản của khách hàng trong vòng 1-3 ngày làm việc.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-paper-plane me-2"></i>Gửi Email Hủy Đơn
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </div>

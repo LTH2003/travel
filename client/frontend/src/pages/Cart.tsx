@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Trash2, ArrowLeft, ShoppingCart, Plus, Minus, Plane, Hotel } from 'lucide-react';
 import Header from '@/components/Header';
+import Footer from '@/components/Footer';
 import { useCart, CartItem, HotelCartItem, TourCartItem } from '@/hooks/useCart';
 import { useTitle } from '@/hooks/useTitle';
 import { format } from 'date-fns';
@@ -279,6 +280,7 @@ export default function Cart() {
             </Card>
           </div>
         </div>
+        <Footer />
       </div>
     </div>
   );

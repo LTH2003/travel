@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@/components/ui/checkbox";
 import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 import SearchForm, { SearchFilters } from "@/components/SearchForm";
 import TourCard from "@/components/TourCard";
 import { Filter, SlidersHorizontal, X, ChevronLeft, ChevronRight } from "lucide-react";
@@ -410,6 +411,7 @@ export default function Tours() {
           </div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }

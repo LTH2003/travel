@@ -62,11 +62,13 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin_or_manager'])
         Route::get('bookings', [AdminBookingController::class, 'index'])->name('bookings.index');
         Route::get('bookings/{id}', [AdminBookingController::class, 'show'])->name('bookings.show');
         Route::put('bookings/{id}/status', [AdminBookingController::class, 'updateStatus'])->name('bookings.updateStatus');
+        Route::delete('bookings/{id}', [AdminBookingController::class, 'destroy'])->name('bookings.destroy');
     });
 
     // Contacts management (chỉ admin)
     Route::middleware('admin')->group(function () {
         Route::resource('contacts', AdminContactController::class);
+        Route::post('contacts/{contact}/send-cancellation-email', [AdminContactController::class, 'sendCancellationEmail'])->name('contacts.send-cancellation-email');
     });
 });
 

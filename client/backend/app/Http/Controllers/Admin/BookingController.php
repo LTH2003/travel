@@ -90,4 +90,15 @@ class BookingController extends Controller
 
         return back()->with('success', 'Cập nhật thành công');
     }
+
+    /**
+     * Delete a booking
+     */
+    public function destroy($id)
+    {
+        $booking = Order::findOrFail($id);
+        $booking->delete();
+
+        return back()->with('success', 'Xóa booking thành công');
+    }
 }

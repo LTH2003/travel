@@ -22,6 +22,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 import TourReviews from "@/components/TourReviews";
 import { tourApi } from "@/api/tourApi"; // ✅ sử dụng API
 import {
@@ -525,6 +526,7 @@ export default function TourDetail() {
           </div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }

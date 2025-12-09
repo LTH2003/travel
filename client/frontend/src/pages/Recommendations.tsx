@@ -5,6 +5,7 @@ import { getRecommendations } from '@/api/recommendationsApi';
 import { Loader2, MapPin, Star, Wifi, Car, Coffee, Utensils } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import Header from '@/components/Header';
+import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useTitle } from '@/hooks/useTitle';
@@ -242,6 +243,7 @@ export default function Recommendations() {
             </Button>
           </div>
         )}
+        <Footer />
       </div>
     </div>
   );

@@ -148,6 +148,11 @@
                                 <a href="{{ route('admin.bookings.show', $booking->id) }}" class="btn btn-sm btn-outline-primary">
                                     <i class="bi bi-eye"></i> Chi Tiết
                                 </a>
+                                @if($booking->status === 'completed')
+                                    <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ $booking->id }}" title="Xóa booking">
+                                        <i class="bi bi-trash"></i> Xóa
+                                    </button>
+                                @endif
                             </td>
                         </tr>
                     @empty
@@ -169,6 +174,38 @@
         @endif
     </div>
 </div>
+
+<!-- Delete Confirmation Modals -->
+@foreach($bookings as $booking)
+    <div class="modal fade" id="deleteModal{{ $booking->id }}" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title">Xác Nhận Xóa Booking</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="mb-2">Bạn có chắc chắn muốn xóa booking này?</p>
+                    <div class="alert alert-warning" role="alert">
+                        <strong>{{ $booking->order_code }}</strong> - {{ $booking->user->name }}<br>
+                        <small class="text-muted">Tổng tiền: {{ number_format($booking->total_amount) }}đ</small>
+                    </div>
+                    <p class="text-muted small mb-0">Hành động này không thể hoàn tác.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <form method="POST" action="{{ route('admin.bookings.destroy', $booking->id) }}" style="display: inline;">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-trash"></i> Xóa Booking
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+@endforeach
 
 <style>
     .card {

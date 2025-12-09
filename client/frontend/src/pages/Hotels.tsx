@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Star, MapPin, Wifi, Car, Coffee, Utensils, Search, Filter, ChevronLeft, ChevronRight } from 'lucide-react';
 import Header from '@/components/Header';
+import Footer from '@/components/Footer';
 import { hotelApi } from '@/api/hotelApi';
 import { useTitle } from '@/hooks/useTitle';
 
@@ -370,6 +371,7 @@ export default function Hotels() {
           </div>
         )}
       </div>
+      <Footer />
     </div>
   );
 }

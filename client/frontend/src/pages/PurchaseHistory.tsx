@@ -4,6 +4,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import Header from '@/components/Header';
+import Footer from '@/components/Footer';
 import { ArrowLeft } from 'lucide-react';
 import bookingAPI from '@/api/booking';
 
@@ -170,6 +171,7 @@ export default function PurchaseHistory() {
           </div>
         )}
       </div>
+      <Footer />
     </div>
   );
 }

@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { CreditCard, Smartphone, Landmark, CheckCircle, Plane, Hotel, Check } from 'lucide-react';
 import Header from '@/components/Header';
+import Footer from '@/components/Footer';
 import { useCart, HotelCartItem, TourCartItem } from '@/hooks/useCart';
 import { useTitle } from '@/hooks/useTitle';
 import { toast } from '@/hooks/use-toast';
@@ -419,6 +420,7 @@ export default function Checkout() {
             </Card>
           </div>
         </div>
+        <Footer />
       </div>
     </div>
   );

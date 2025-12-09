@@ -185,12 +185,6 @@
                 </button>
             </form>
 
-            <div class="demo-credentials">
-                <strong>📝 Tài khoản Admin Demo:</strong><br>
-                Email: <code>admin@example.com</code><br>
-                Password: <code>password</code>
-            </div>
-
             <div class="footer-text">
                 © 2025 Travel App Admin Panel
             </div>

@@ -20,6 +20,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import Header from "@/components/Header";
+import Footer from '@/components/Footer';
 
 export default function Profile() {
   const { user, setUser, loading: authLoading } = useAuth();
@@ -499,6 +500,7 @@ export default function Profile() {
           </div>
         </DialogContent>
       </Dialog>
+      <Footer />
     </div>
   );
 }

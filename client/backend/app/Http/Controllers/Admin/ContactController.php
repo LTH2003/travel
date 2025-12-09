@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Contact;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 class ContactController extends Controller
 {
@@ -114,4 +115,51 @@ class ContactController extends Controller
 
         return redirect()->route('admin.contacts.index')->with('success', 'Xóa tin nhắn thành công');
     }
+
+    /**
+     * Send cancellation email with refund notification
+     */
+    public function sendCancellationEmail(Request $request, Contact $contact)
+    {
+        $validated = $request->validate([
+            'refund_amount' => 'required|numeric|min:0',
+            'cancellation_reason' => 'required|string|min:10',
+        ]);
+
+        try {
+            // Prepare email data
+            $customerName = $contact->name;
+            $customerEmail = $contact->email;
+            $refundAmount = $validated['refund_amount'];
+            $message = $validated['cancellation_reason'];
+            $refundDate = now()->addDays(3)->format('d/m/Y');
+
+            // Send email using Mail facade with view
+            Mail::send('emails.cancellation-notification', [
+                'customer_name' => $customerName,
+                'customer_email' => $customerEmail,
+                'subject' => 'Thông báo hủy đơn hàng và hoàn tiền',
+                'cancellation_reason' => $message,
+                'refund_amount' => $refundAmount,
+                'refund_date' => $refundDate,
+            ], function ($message) use ($customerEmail) {
+                $message->from(config('mail.from.address'), config('mail.from.name'))
+                        ->to($customerEmail)
+                        ->subject('Thông báo hủy đơn hàng và hoàn tiền');
+            });
+
+            // Update contact with cancellation info
+            $contact->update([
+                'status' => 'replied',
+                'response' => "Hủy đơn - Hoàn tiền: " . $refundAmount . " VND. Lý do: " . $message,
+                'responded_by' => auth()->user()->id,
+                'responded_at' => now(),
+            ]);
+
+            return redirect()->back()->with('success', 'Email hủy đơn và hoàn tiền đã được gửi thành công tới ' . $customerEmail);
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Lỗi khi gửi email: ' . $e->getMessage());
+        }
+    }
+
 }

@@ -15,6 +15,7 @@ import {
   Tag,
 } from "lucide-react";
 import Header from "@/components/Header";
+import Footer from '@/components/Footer';
 import BlogComments from "@/components/BlogComments";
 import { blogApi } from "@/api/blogApi";
 import { toast } from "@/hooks/use-toast";
@@ -141,10 +142,10 @@ export default function BlogDetail() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 flex flex-col">
       <Header />
 
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8 flex-grow">
         {/* Breadcrumb */}
         <div className="flex items-center space-x-2 text-sm text-gray-600 mb-6">
           <Link to="/blog" className="hover:text-blue-600 flex items-center">
@@ -307,6 +308,7 @@ export default function BlogDetail() {
           </div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }
