@@ -83,12 +83,34 @@ class TourManagerController extends Controller
             'price' => 'required|numeric|min:0',
             'duration' => 'required|integer|min:1',
             'image' => 'nullable|image|max:2048',
+            'departure' => 'nullable|array',
+            'departure.*' => 'string|max:255',
+            'highlights' => 'nullable|array',
+            'highlights.*' => 'string|max:255',
+            'includes' => 'nullable|array',
+            'includes.*' => 'string|max:255',
+            'itinerary' => 'nullable|array',
+            'itinerary.*' => 'string|max:255',
         ]);
 
         // Handle image upload
         if ($request->hasFile('image')) {
             $path = $request->file('image')->store('tours', 'public');
             $validated['image'] = $path;
+        }
+
+        // Convert array fields to JSON if provided
+        if (isset($validated['departure'])) {
+            $validated['departure'] = array_filter($validated['departure']);
+        }
+        if (isset($validated['highlights'])) {
+            $validated['highlights'] = array_filter($validated['highlights']);
+        }
+        if (isset($validated['includes'])) {
+            $validated['includes'] = array_filter($validated['includes']);
+        }
+        if (isset($validated['itinerary'])) {
+            $validated['itinerary'] = array_filter($validated['itinerary']);
         }
 
         Tour::create($validated);
@@ -117,12 +139,34 @@ class TourManagerController extends Controller
             'price' => 'required|numeric|min:0',
             'duration' => 'required|integer|min:1',
             'image' => 'nullable|image|max:2048',
+            'departure' => 'nullable|array',
+            'departure.*' => 'string|max:255',
+            'highlights' => 'nullable|array',
+            'highlights.*' => 'string|max:255',
+            'includes' => 'nullable|array',
+            'includes.*' => 'string|max:255',
+            'itinerary' => 'nullable|array',
+            'itinerary.*' => 'string|max:255',
         ]);
 
         // Handle image upload
         if ($request->hasFile('image')) {
             $path = $request->file('image')->store('tours', 'public');
             $validated['image'] = $path;
+        }
+
+        // Convert array fields to JSON if provided
+        if (isset($validated['departure'])) {
+            $validated['departure'] = array_filter($validated['departure']);
+        }
+        if (isset($validated['highlights'])) {
+            $validated['highlights'] = array_filter($validated['highlights']);
+        }
+        if (isset($validated['includes'])) {
+            $validated['includes'] = array_filter($validated['includes']);
+        }
+        if (isset($validated['itinerary'])) {
+            $validated['itinerary'] = array_filter($validated['itinerary']);
         }
 
         $tour->update($validated);

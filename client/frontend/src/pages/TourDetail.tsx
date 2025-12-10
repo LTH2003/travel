@@ -303,14 +303,18 @@ export default function TourDetail() {
                     <CardTitle>Điểm nổi bật</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      {tour.highlights.map((highlight, index) => (
-                        <div key={index} className="flex items-start space-x-2">
-                          <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
-                          <span className="text-gray-600">{highlight}</span>
-                        </div>
-                      ))}
-                    </div>
+                    {Array.isArray(tour.highlights) && tour.highlights.length > 0 ? (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        {tour.highlights.map((highlight, index) => (
+                          <div key={index} className="flex items-start space-x-2">
+                            <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
+                            <span className="text-gray-600">{highlight}</span>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-gray-500">Chưa có điểm nổi bật</p>
+                    )}
                   </CardContent>
                 </Card>
               </TabsContent>
@@ -321,21 +325,18 @@ export default function TourDetail() {
                     <CardTitle>Lịch trình chi tiết</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    {Array.isArray(tour.itinerary) &&
-                      tour.itinerary.map((day: any, index: number) => (
-                        <div key={index} className="mb-4">
-                          <h4 className="font-semibold text-lg mb-2">
-                            Ngày {day.day}: {day.title}
-                          </h4>
-                          <ul className="list-disc pl-6 text-gray-600">
-                            {day.activities.map(
-                              (activity: string, i: number) => (
-                                <li key={i}>{activity}</li>
-                              )
-                            )}
-                          </ul>
-                        </div>
-                      ))}
+                    {Array.isArray(tour.itinerary) && tour.itinerary.length > 0 ? (
+                      <ul className="space-y-3 text-gray-600">
+                        {tour.itinerary.map((item: string, index: number) => (
+                          <li key={index} className="flex items-start space-x-2">
+                            <span className="text-orange-600 font-semibold">•</span>
+                            <span>{item}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className="text-gray-500">Chưa có lịch trình</p>
+                    )}
                   </CardContent>
                 </Card>
               </TabsContent>
@@ -346,12 +347,18 @@ export default function TourDetail() {
                     <CardTitle>Tour bao gồm</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <ul className="list-disc pl-6 text-gray-600">
-                      {Array.isArray(tour.includes) &&
-                        tour.includes.map((item: string, index: number) => (
-                          <li key={index}>{item}</li>
+                    {Array.isArray(tour.includes) && tour.includes.length > 0 ? (
+                      <ul className="space-y-2">
+                        {tour.includes.map((item: string, index: number) => (
+                          <li key={index} className="flex items-center space-x-2 text-gray-600">
+                            <Check className="h-5 w-5 text-green-500 flex-shrink-0" />
+                            <span>{item}</span>
+                          </li>
                         ))}
-                    </ul>
+                      </ul>
+                    ) : (
+                      <p className="text-gray-500">Chưa có thông tin bao gồm</p>
+                    )}
                   </CardContent>
                 </Card>
               </TabsContent>
@@ -388,11 +395,15 @@ export default function TourDetail() {
                         <SelectValue placeholder="Chọn điểm khởi hành" />
                       </SelectTrigger>
                       <SelectContent>
-                        {tour.departure.map((dep) => (
-                          <SelectItem key={dep} value={dep}>
-                            {dep}
-                          </SelectItem>
-                        ))}
+                        {Array.isArray(tour.departure) && tour.departure.length > 0 ? (
+                          tour.departure.map((dep) => (
+                            <SelectItem key={dep} value={dep}>
+                              {dep}
+                            </SelectItem>
+                          ))
+                        ) : (
+                          <div className="p-2 text-gray-500">Không có điểm khởi hành</div>
+                        )}
                       </SelectContent>
                     </Select>
                   </div>

@@ -137,6 +137,154 @@
                         </div>
                     </div>
 
+                    <div class="mb-3">
+                        <label class="form-label">Điểm khởi hành</label>
+                        <div id="departure-container">
+                            @php
+                                $departures = old('departure', []);
+                                if (empty($departures)) {
+                                    $departures = [''];
+                                }
+                            @endphp
+                            @foreach($departures as $index => $departure)
+                                <div class="input-group mb-2">
+                                    <input 
+                                        type="text" 
+                                        class="form-control @error('departure.'.$index) is-invalid @enderror" 
+                                        name="departure[]" 
+                                        value="{{ $departure }}"
+                                        placeholder="Nhập điểm khởi hành (vd: Hà Nội, Sài Gòn)"
+                                    >
+                                    @if($index > 0)
+                                        <button type="button" class="btn btn-outline-danger remove-item" data-type="departure" title="Xóa">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    @endif
+                                </div>
+                                @error('departure.'.$index)
+                                    <small class="text-danger d-block mb-2">{{ $message }}</small>
+                                @enderror
+                            @endforeach
+                        </div>
+                        <button type="button" class="add-item btn btn-sm btn-outline-primary" data-type="departure">
+                            <i class="bi bi-plus"></i> Thêm điểm khởi hành
+                        </button>
+                        @error('departure')
+                            <small class="text-danger d-block">{{ $message }}</small>
+                        @enderror
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Điểm nổi bật (Highlights)</label>
+                        <div id="highlights-container">
+                            @php
+                                $highlights = old('highlights', []);
+                                if (empty($highlights)) {
+                                    $highlights = [''];
+                                }
+                            @endphp
+                            @foreach($highlights as $index => $highlight)
+                                <div class="input-group mb-2">
+                                    <input 
+                                        type="text" 
+                                        class="form-control @error('highlights.'.$index) is-invalid @enderror" 
+                                        name="highlights[]" 
+                                        value="{{ $highlight }}"
+                                        placeholder="Nhập điểm nổi bật (vd: Tham quan Hạ Long Bay)"
+                                    >
+                                    @if($index > 0)
+                                        <button type="button" class="btn btn-outline-danger remove-item" data-type="highlights" title="Xóa">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    @endif
+                                </div>
+                                @error('highlights.'.$index)
+                                    <small class="text-danger d-block mb-2">{{ $message }}</small>
+                                @enderror
+                            @endforeach
+                        </div>
+                        <button type="button" class="add-item btn btn-sm btn-outline-primary" data-type="highlights">
+                            <i class="bi bi-plus"></i> Thêm điểm nổi bật
+                        </button>
+                        @error('highlights')
+                            <small class="text-danger d-block">{{ $message }}</small>
+                        @enderror
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Bao gồm (Includes)</label>
+                        <div id="includes-container">
+                            @php
+                                $includes = old('includes', []);
+                                if (empty($includes)) {
+                                    $includes = [''];
+                                }
+                            @endphp
+                            @foreach($includes as $index => $include)
+                                <div class="input-group mb-2">
+                                    <input 
+                                        type="text" 
+                                        class="form-control @error('includes.'.$index) is-invalid @enderror" 
+                                        name="includes[]" 
+                                        value="{{ $include }}"
+                                        placeholder="Nhập dịch vụ bao gồm (vd: Vé máy bay, Khách sạn 3 sao)"
+                                    >
+                                    @if($index > 0)
+                                        <button type="button" class="btn btn-outline-danger remove-item" data-type="includes" title="Xóa">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    @endif
+                                </div>
+                                @error('includes.'.$index)
+                                    <small class="text-danger d-block mb-2">{{ $message }}</small>
+                                @enderror
+                            @endforeach
+                        </div>
+                        <button type="button" class="add-item btn btn-sm btn-outline-primary" data-type="includes">
+                            <i class="bi bi-plus"></i> Thêm dịch vụ bao gồm
+                        </button>
+                        @error('includes')
+                            <small class="text-danger d-block">{{ $message }}</small>
+                        @enderror
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Lịch trình (Itinerary)</label>
+                        <div id="itinerary-container">
+                            @php
+                                $itineraries = old('itinerary', []);
+                                if (empty($itineraries)) {
+                                    $itineraries = [''];
+                                }
+                            @endphp
+                            @foreach($itineraries as $index => $itinerary)
+                                <div class="input-group mb-2">
+                                    <input 
+                                        type="text" 
+                                        class="form-control @error('itinerary.'.$index) is-invalid @enderror" 
+                                        name="itinerary[]" 
+                                        value="{{ $itinerary }}"
+                                        placeholder="Nhập chi tiết lịch trình (vd: Ngày 1: Hà Nội - Hạ Long)"
+                                    >
+                                    @if($index > 0)
+                                        <button type="button" class="btn btn-outline-danger remove-item" data-type="itinerary" title="Xóa">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    @endif
+                                </div>
+                                @error('itinerary.'.$index)
+                                    <small class="text-danger d-block mb-2">{{ $message }}</small>
+                                @enderror
+                            @endforeach
+                        </div>
+                        <button type="button" class="add-item btn btn-sm btn-outline-primary" data-type="itinerary">
+                            <i class="bi bi-plus"></i> Thêm lịch trình
+                        </button>
+                        @error('itinerary')
+                            <small class="text-danger d-block">{{ $message }}</small>
+                        @enderror
+                    </div>
+
                     <div class="row">
                         <div class="col-md-3">
                             <div class="mb-3">
@@ -203,4 +351,64 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const fieldConfigs = {
+        departure: {
+            containerId: 'departure-container',
+            placeholder: 'Nhập điểm khởi hành (vd: Hà Nội, Sài Gòn)',
+            fieldName: 'departure'
+        },
+        highlights: {
+            containerId: 'highlights-container',
+            placeholder: 'Nhập điểm nổi bật (vd: Tham quan Hạ Long Bay)',
+            fieldName: 'highlights'
+        },
+        includes: {
+            containerId: 'includes-container',
+            placeholder: 'Nhập dịch vụ bao gồm (vd: Vé máy bay, Khách sạn 3 sao)',
+            fieldName: 'includes'
+        },
+        itinerary: {
+            containerId: 'itinerary-container',
+            placeholder: 'Nhập chi tiết lịch trình (vd: Ngày 1: Hà Nội - Hạ Long)',
+            fieldName: 'itinerary'
+        }
+    };
+
+    // Add item button listeners
+    document.querySelectorAll('.add-item').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const type = this.getAttribute('data-type');
+            const config = fieldConfigs[type];
+            const container = document.getElementById(config.containerId);
+            
+            const newInput = document.createElement('div');
+            newInput.classList.add('input-group', 'mb-2');
+            newInput.innerHTML = `
+                <input type="text" class="form-control" name="${config.fieldName}[]" placeholder="${config.placeholder}">
+                <button type="button" class="btn btn-outline-danger remove-item" data-type="${type}" title="Xóa">
+                    <i class="bi bi-trash"></i>
+                </button>
+            `;
+            container.appendChild(newInput);
+            attachRemoveListener(newInput.querySelector('.remove-item'));
+        });
+    });
+
+    // Remove item button listeners
+    function attachRemoveListener(btn) {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            this.closest('.input-group').remove();
+        });
+    }
+
+    document.querySelectorAll('.remove-item').forEach(btn => {
+        attachRemoveListener(btn);
+    });
+});
+</script>
 @endsection

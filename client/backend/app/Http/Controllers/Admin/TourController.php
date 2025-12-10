@@ -43,7 +43,29 @@ class TourController extends Controller
             'max_guests' => 'nullable|integer|min:1',
             'image' => 'nullable|string',
             'rating' => 'nullable|numeric|min:0|max:5',
+            'departure' => 'nullable|array',
+            'departure.*' => 'string|max:255',
+            'highlights' => 'nullable|array',
+            'highlights.*' => 'string|max:255',
+            'includes' => 'nullable|array',
+            'includes.*' => 'string|max:255',
+            'itinerary' => 'nullable|array',
+            'itinerary.*' => 'string|max:255',
         ]);
+
+        // Convert array fields to JSON if provided
+        if (isset($validated['departure'])) {
+            $validated['departure'] = array_filter($validated['departure']);
+        }
+        if (isset($validated['highlights'])) {
+            $validated['highlights'] = array_filter($validated['highlights']);
+        }
+        if (isset($validated['includes'])) {
+            $validated['includes'] = array_filter($validated['includes']);
+        }
+        if (isset($validated['itinerary'])) {
+            $validated['itinerary'] = array_filter($validated['itinerary']);
+        }
 
         // Gán created_by cho user hiện tại
         $validated['created_by'] = auth()->id();
@@ -94,7 +116,29 @@ class TourController extends Controller
             'max_guests' => 'nullable|integer|min:1',
             'image' => 'nullable|string',
             'rating' => 'nullable|numeric|min:0|max:5',
+            'departure' => 'nullable|array',
+            'departure.*' => 'string|max:255',
+            'highlights' => 'nullable|array',
+            'highlights.*' => 'string|max:255',
+            'includes' => 'nullable|array',
+            'includes.*' => 'string|max:255',
+            'itinerary' => 'nullable|array',
+            'itinerary.*' => 'string|max:255',
         ]);
+
+        // Convert array fields to JSON if provided
+        if (isset($validated['departure'])) {
+            $validated['departure'] = array_filter($validated['departure']);
+        }
+        if (isset($validated['highlights'])) {
+            $validated['highlights'] = array_filter($validated['highlights']);
+        }
+        if (isset($validated['includes'])) {
+            $validated['includes'] = array_filter($validated['includes']);
+        }
+        if (isset($validated['itinerary'])) {
+            $validated['itinerary'] = array_filter($validated['itinerary']);
+        }
 
         $tour->update($validated);
 

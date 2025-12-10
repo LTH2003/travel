@@ -65,45 +65,99 @@
                 </div>
                 <div class="card-body">
                     @if($booking->bookingDetails->count() > 0)
-                        <div class="table-responsive">
-                            <table class="table table-sm mb-0">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th>Sản Phẩm</th>
-                                        <th>Loại</th>
-                                        <th class="text-center">Số Lượng</th>
-                                        <th class="text-right">Giá</th>
-                                        <th class="text-right">Tổng</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach($booking->bookingDetails as $detail)
-                                        @php
-                                            $itemName = 'Unknown';
-                                            if ($detail->booking_info && isset($detail->booking_info['name'])) {
-                                                $itemName = $detail->booking_info['name'];
-                                            }
-                                        @endphp
-                                        <tr>
-                                            <td>{{ $itemName }}</td>
-                                            <td>
-                                                @if(strtolower($detail->bookable_type) === 'tour')
-                                                    <span class="badge bg-info">Tour</span>
-                                                @else
-                                                    <span class="badge bg-secondary">{{ $detail->bookable_type }}</span>
-                                                @endif
-                                            </td>
-                                            <td class="text-center">{{ $detail->quantity }}</td>
-                                            <td class="text-right">{{ number_format($detail->price) }}đ</td>
-                                            <td class="text-right fw-bold">{{ number_format($detail->price * $detail->quantity) }}đ</td>
-                                        </tr>
-                                    @endforeach
-                                    <tr class="table-light">
-                                        <td colspan="4" class="text-end fw-bold">Tổng Cộng:</td>
-                                        <td class="text-right fw-bold text-primary">{{ number_format($booking->total_amount) }}đ</td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                        @foreach($booking->bookingDetails as $detail)
+                            @php
+                                $itemName = 'Unknown';
+                                $itemType = 'Unknown';
+                                $details = [];
+                                
+                                if ($detail->booking_info) {
+                                    $itemName = $detail->booking_info['name'] ?? 'Unknown';
+                                    $details = $detail->booking_info;
+                                }
+                                
+                                if(strpos($detail->bookable_type, 'Tour') !== false) {
+                                    $itemType = '🎫 Tour';
+                                } elseif(strpos($detail->bookable_type, 'Room') !== false || strpos($detail->bookable_type, 'Hotel') !== false) {
+                                    $itemType = '🏨 Phòng/Khách sạn';
+                                }
+                            @endphp
+                            <div class="card border mb-3">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-8">
+                                            <h6 class="card-title mb-2">
+                                                <strong>{{ $itemName }}</strong>
+                                                <span class="badge bg-info ms-2">{{ $itemType }}</span>
+                                            </h6>
+                                            
+                                            @if(isset($details['destination']))
+                                                <p class="mb-1">
+                                                    <strong class="text-muted">Điểm Đến:</strong> {{ $details['destination'] }}
+                                                </p>
+                                            @endif
+                                            
+                                            @if(isset($details['duration']))
+                                                <p class="mb-1">
+                                                    <strong class="text-muted">Thời Gian:</strong> {{ $details['duration'] }}
+                                                </p>
+                                            @endif
+                                            
+                                            @if(isset($details['hotel']))
+                                                <p class="mb-1">
+                                                    <strong class="text-muted">Khách Sạn:</strong> {{ $details['hotel'] }}
+                                                </p>
+                                            @endif
+                                            
+                                            @if(isset($details['location']))
+                                                <p class="mb-1">
+                                                    <strong class="text-muted">Địa Chỉ:</strong> {{ $details['location'] }}
+                                                </p>
+                                            @endif
+                                            
+                                            @if(isset($details['capacity']))
+                                                <p class="mb-1">
+                                                    <strong class="text-muted">Sức Chứa:</strong> {{ $details['capacity'] }} người
+                                                </p>
+                                            @endif
+                                            
+                                            @if(isset($details['description']) && $details['description'])
+                                                <p class="mb-1">
+                                                    <strong class="text-muted">Mô Tả:</strong><br>
+                                                    <small>{{ $details['description'] }}...</small>
+                                                </p>
+                                            @endif
+                                        </div>
+                                        <div class="col-md-4 text-end">
+                                            <p class="mb-1">
+                                                <strong class="text-muted">Giá:</strong><br>
+                                                <strong>{{ number_format($detail->price) }}đ</strong>
+                                            </p>
+                                            <p class="mb-1">
+                                                <strong class="text-muted">Số Lượng:</strong><br>
+                                                <strong>{{ $detail->quantity }}</strong>
+                                            </p>
+                                            <p class="mb-0">
+                                                <strong class="text-muted">Tổng:</strong><br>
+                                                <strong class="text-primary">{{ number_format($detail->price * $detail->quantity) }}đ</strong>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                        
+                        <div class="card border-0 bg-light">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <h6 class="mb-0">TỔNG CỘNG</h6>
+                                    </div>
+                                    <div class="col-md-4 text-end">
+                                        <h5 class="mb-0 text-primary">{{ number_format($booking->total_amount) }}đ</h5>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     @else
                         <p class="text-muted mb-0">Không có item nào</p>

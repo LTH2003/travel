@@ -17,7 +17,7 @@ class Tour extends Model
 ];
 
     protected $fillable = [
-        'title', 'destination', 'description', 'price', 'original_price', 'duration', 'image', 'rating', 'review_count', 'created_by', 'category', 'max_guests'
+        'title', 'destination', 'description', 'price', 'original_price', 'duration', 'image', 'rating', 'review_count', 'created_by', 'category', 'max_guests', 'highlights', 'includes', 'itinerary', 'departure'
     ];
 
     /**

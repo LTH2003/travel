@@ -104,9 +104,38 @@
             <h4>📦 Chi Tiết Đặt Hàng:</h4>
             @foreach($bookingDetails as $detail)
                 <div class="item-card">
-                    <strong>{{ $detail['name'] }}</strong><br>
-                    <small>Loại: {{ strtolower($detail['type']) === 'tour' ? '🎫 Tour' : '🏨 Khách Sạn' }}</small><br>
-                    <small>Số Lượng: {{ $detail['quantity'] }} | Giá: {{ number_format($detail['price']) }} VNĐ</small>
+                    <strong style="font-size: 16px;">{{ $detail['name'] }}</strong><br>
+                    <small style="color: #666;">{{ strtolower($detail['type']) === 'tour' ? '🎫 Tour' : '🏨 Khách Sạn' }}</small>
+                    
+                    @if(isset($detail['destination']))
+                        <br><small><strong>📍 Điểm đến:</strong> {{ $detail['destination'] }}</small>
+                    @endif
+                    
+                    @if(isset($detail['duration']))
+                        <br><small><strong>⏱️ Thời gian:</strong> {{ $detail['duration'] }}</small>
+                    @endif
+                    
+                    @if(isset($detail['hotel']))
+                        <br><small><strong>🏨 Khách sạn:</strong> {{ $detail['hotel'] }}</small>
+                    @endif
+                    
+                    @if(isset($detail['location']))
+                        <br><small><strong>📍 Địa chỉ:</strong> {{ $detail['location'] }}</small>
+                    @endif
+                    
+                    @if(isset($detail['capacity']))
+                        <br><small><strong>👥 Sức chứa:</strong> {{ $detail['capacity'] }} người</small>
+                    @endif
+                    
+                    @if(isset($detail['description']) && $detail['description'])
+                        <br><small><strong>ℹ️ Mô tả:</strong> {{ substr($detail['description'], 0, 100) }}...</small>
+                    @endif
+                    
+                    <br><br><small style="color: #d97706; font-weight: bold;">
+                        Số lượng: {{ $detail['quantity'] }} | 
+                        Giá: {{ number_format($detail['price']) }} VNĐ | 
+                        <span style="color: #059669;">Tổng: {{ number_format($detail['price'] * $detail['quantity']) }} VNĐ</span>
+                    </small>
                 </div>
             @endforeach
 

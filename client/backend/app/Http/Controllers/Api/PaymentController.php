@@ -136,19 +136,57 @@ class PaymentController extends Controller
                 // Convert type to proper class name (tour -> Tour, hotel -> Hotel)
                 $itemType = $item['type'] ?? 'tour';
                 $bookableType = ucfirst(strtolower($itemType));
+                $bookableId = $item['id'] ?? null;
                 
-                BookingDetail::create([
-                    'order_id' => $order->id,
-                    'bookable_id' => $item['id'] ?? null,
-                    'bookable_type' => $bookableType,
-                    'quantity' => $item['quantity'] ?? 1,
-                    'price' => $item['price'] ?? 0,
-                    'booking_info' => [
+                // Fetch full item details from database
+                $itemDetails = null;
+                if ($bookableType === 'Tour') {
+                    $tourModel = \App\Models\Tour::find($bookableId);
+                    if ($tourModel) {
+                        $itemDetails = [
+                            'name' => $tourModel->title ?? $item['name'],
+                            'destination' => $tourModel->destination ?? null,
+                            'duration' => $tourModel->duration ?? null,
+                            'description' => substr($tourModel->description ?? '', 0, 200),
+                            'quantity' => $item['quantity'] ?? 1,
+                            'price' => $item['price'] ?? 0,
+                            'totalPrice' => ($item['quantity'] ?? 1) * ($item['price'] ?? 0),
+                        ];
+                    }
+                } elseif ($bookableType === 'Hotel' || $bookableType === 'Room') {
+                    // For rooms, get both room and hotel info
+                    $roomModel = \App\Models\Room::find($bookableId);
+                    if ($roomModel) {
+                        $itemDetails = [
+                            'name' => $roomModel->name ?? $item['name'],
+                            'hotel' => $roomModel->hotel?->name ?? null,
+                            'location' => $roomModel->hotel?->location ?? null,
+                            'capacity' => $roomModel->capacity ?? null,
+                            'description' => substr($roomModel->description ?? '', 0, 200),
+                            'quantity' => $item['quantity'] ?? 1,
+                            'price' => $item['price'] ?? 0,
+                            'totalPrice' => ($item['quantity'] ?? 1) * ($item['price'] ?? 0),
+                        ];
+                    }
+                }
+                
+                // Fallback to basic info if item not found
+                if (!$itemDetails) {
+                    $itemDetails = [
                         'name' => $item['name'] ?? 'Unknown',
                         'quantity' => $item['quantity'] ?? 1,
                         'price' => $item['price'] ?? 0,
                         'totalPrice' => ($item['quantity'] ?? 1) * ($item['price'] ?? 0),
-                    ],
+                    ];
+                }
+                
+                BookingDetail::create([
+                    'order_id' => $order->id,
+                    'bookable_id' => $bookableId,
+                    'bookable_type' => $bookableType,
+                    'quantity' => $item['quantity'] ?? 1,
+                    'price' => $item['price'] ?? 0,
+                    'booking_info' => $itemDetails,
                 ]);
             }
 

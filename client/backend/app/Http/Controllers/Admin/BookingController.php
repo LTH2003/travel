@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\BookingDetail;
+use App\Models\Room;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class BookingController extends Controller
 {
@@ -92,13 +94,31 @@ class BookingController extends Controller
     }
 
     /**
-     * Delete a booking
+     * Delete a booking and restore room availability
      */
     public function destroy($id)
     {
-        $booking = Order::findOrFail($id);
-        $booking->delete();
-
-        return back()->with('success', 'Xóa booking thành công');
+        return DB::transaction(function () use ($id) {
+            $booking = Order::findOrFail($id);
+            
+            // Get all booking details
+            $bookingDetails = BookingDetail::where('order_id', $booking->id)->get();
+            
+            // Restore room availability for each booked room
+            foreach ($bookingDetails as $detail) {
+                if ($detail->bookable_type === 'App\\Models\\Room') {
+                    $room = Room::find($detail->bookable_id);
+                    if ($room) {
+                        // Restore the available count
+                        $room->increment('available', $detail->quantity);
+                    }
+                }
+            }
+            
+            // Delete the booking
+            $booking->delete();
+            
+            return back()->with('success', 'Xóa booking thành công và hoàn trả phòng');
+        });
     }
 }

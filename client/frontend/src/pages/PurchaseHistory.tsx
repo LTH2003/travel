@@ -125,19 +125,59 @@ export default function PurchaseHistory() {
 
                 <div className="border-t pt-4 mt-4">
                   <h4 className="font-semibold text-gray-900 mb-3">Các mục trong đơn hàng:</h4>
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     {booking.items.map((item: any, idx: number) => (
-                      <div key={idx} className="flex justify-between items-center bg-gray-50 p-3 rounded">
-                        <div className="flex-1">
-                          <p className="font-medium text-gray-900">{item.name}</p>
-                          <p className="text-sm text-gray-600">
-                            {item.type === 'tour' ? '🎫 Tour' : '🏨 Phòng'} | SL: {item.quantity}
-                          </p>
+                      <div key={idx} className="border rounded-lg p-4 bg-gray-50 hover:bg-gray-100 transition">
+                        <div className="flex justify-between items-start mb-2">
+                          <div className="flex-1">
+                            <h5 className="font-bold text-gray-900 mb-1">{item.name}</h5>
+                            <div className="flex gap-2 mb-2">
+                              <span className="inline-block px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded font-semibold">
+                                {item.type === 'tour' ? '🎫 Tour' : '🏨 Phòng'}
+                              </span>
+                              <span className="inline-block px-2 py-1 bg-gray-200 text-gray-700 text-xs rounded">
+                                SL: {item.quantity}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-sm text-gray-600">Giá/cái:</p>
+                            <p className="font-bold text-gray-900">{formatPrice(item.price)}</p>
+                          </div>
                         </div>
-                        <div className="text-right">
-                          <p className="font-bold text-orange-600">
-                            {formatPrice(item.price * item.quantity)}
+                        
+                        {/* Show additional details if available */}
+                        {item.destination && (
+                          <p className="text-sm text-gray-600 mb-1">
+                            <span className="font-semibold">📍 Điểm đến:</span> {item.destination}
                           </p>
+                        )}
+                        {item.duration && (
+                          <p className="text-sm text-gray-600 mb-1">
+                            <span className="font-semibold">⏱️ Thời gian:</span> {item.duration}
+                          </p>
+                        )}
+                        {item.hotel && (
+                          <p className="text-sm text-gray-600 mb-1">
+                            <span className="font-semibold">🏨 Khách sạn:</span> {item.hotel}
+                          </p>
+                        )}
+                        {item.location && (
+                          <p className="text-sm text-gray-600 mb-1">
+                            <span className="font-semibold">📍 Địa chỉ:</span> {item.location}
+                          </p>
+                        )}
+                        {item.capacity && (
+                          <p className="text-sm text-gray-600 mb-1">
+                            <span className="font-semibold">👥 Sức chứa:</span> {item.capacity} người
+                          </p>
+                        )}
+                        
+                        <div className="border-t pt-2 mt-2">
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm text-gray-600">Tổng cộng:</span>
+                            <span className="font-bold text-orange-600">{formatPrice(item.price * item.quantity)}</span>
+                          </div>
                         </div>
                       </div>
                     ))}
