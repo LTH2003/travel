@@ -92,26 +92,20 @@
             <table class="table table-hover table-striped mb-0">
                 <thead class="table-light">
                     <tr>
-                        <th style="width: 15%;">
-                            <i class="bi bi-door-closed me-2"></i> Name
+                        <th style="width: 20%;">
+                            <i class="bi bi-door-closed me-2"></i> Tên Phòng
                         </th>
                         <th style="width: 12%;">
-                            <i class="bi bi-cash-coin me-2"></i> Price
-                        </th>
-                        <th style="width: 10%;">
-                            <i class="bi bi-people me-2"></i> Capacity
+                            <i class="bi bi-cash-coin me-2"></i> Giá
                         </th>
                         <th style="width: 12%;">
-                            <i class="bi bi-bed me-2"></i> Bed Type
+                            <i class="bi bi-people me-2"></i> Sức Chứa
                         </th>
-                        <th style="width: 25%;">
-                            <i class="bi bi-star me-2"></i> Amenities
+                        <th style="width: 30%;">
+                            <i class="bi bi-star me-2"></i> Tiện Nghi
                         </th>
-                        <th style="width: 10%;">
-                            <i class="bi bi-rulers me-2"></i> Area
-                        </th>
-                        <th style="width: 16%;" class="text-center">
-                            <i class="bi bi-gear me-2"></i> Actions
+                        <th style="width: 26%;" class="text-center">
+                            <i class="bi bi-gear me-2"></i> Hành Động
                         </th>
                     </tr>
                 </thead>
@@ -132,13 +126,6 @@
                                 </span>
                             </td>
                             <td>
-                                @if($room->bed_type)
-                                    <span class="badge bg-secondary">{{ $room->bed_type }}</span>
-                                @else
-                                    <span class="text-muted">—</span>
-                                @endif
-                            </td>
-                            <td>
                                 @php
                                     $amenities = $room->amenities;
                                     // Handle both array and JSON string formats
@@ -151,41 +138,34 @@
                                 @endphp
                                 @if(count($amenities) > 0)
                                     <div class="d-flex gap-1 flex-wrap">
-                                        @foreach(array_slice($amenities, 0, 3) as $amenity)
+                                        @foreach(array_slice($amenities, 0, 4) as $amenity)
                                             <span class="badge bg-light text-dark border border-secondary" title="{{ $amenity }}">
                                                 {{ Str::limit($amenity, 12) }}
                                             </span>
                                         @endforeach
-                                        @if(count($amenities) > 3)
-                                            <span class="badge bg-light text-dark border border-secondary" title="and {{ count($amenities) - 3 }} more">
-                                                +{{ count($amenities) - 3 }}
+                                        @if(count($amenities) > 4)
+                                            <span class="badge bg-light text-dark border border-secondary" title="and {{ count($amenities) - 4 }} more">
+                                                +{{ count($amenities) - 4 }}
                                             </span>
                                         @endif
                                     </div>
                                 @else
-                                    <span class="text-muted small">No amenities</span>
-                                @endif
-                            </td>
-                            <td>
-                                @if($room->area)
-                                    <strong>{{ number_format($room->area, 1) }} m²</strong>
-                                @else
-                                    <span class="text-muted">—</span>
+                                    <span class="text-muted small">Không có tiện nghi</span>
                                 @endif
                             </td>
                             <td class="text-center">
                                 <div class="btn-group btn-group-sm" role="group">
                                     <a href="{{ route('admin.hotels.rooms.edit', [$hotel, $room]) }}" 
                                        class="btn btn-outline-warning" 
-                                       title="Edit Room">
-                                        <i class="bi bi-pencil me-1"></i> Edit
+                                       title="Chỉnh sửa phòng">
+                                        <i class="bi bi-pencil me-1"></i> Sửa
                                     </a>
                                     <button type="button" 
                                             class="btn btn-outline-danger"
                                             data-bs-toggle="modal"
                                             data-bs-target="#deleteModal{{ $room->id }}"
-                                            title="Delete Room">
-                                        <i class="bi bi-trash me-1"></i> Delete
+                                            title="Xóa phòng">
+                                        <i class="bi bi-trash me-1"></i> Xóa
                                     </button>
                                 </div>
 
@@ -196,7 +176,7 @@
                                             <div class="modal-header bg-danger bg-opacity-10 border-danger">
                                                 <h6 class="modal-title">
                                                     <i class="bi bi-exclamation-triangle text-danger me-2"></i>
-                                                    Delete Room
+                                                    Xóa Phòng
                                                 </h6>
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                             </div>

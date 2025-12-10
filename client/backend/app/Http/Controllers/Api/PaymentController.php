@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\BookingDetail;
 use App\Models\Payment;
+use App\Models\Room;
 use App\Services\MoMoPaymentService;
 use App\Services\VietQRPaymentService;
 use App\Services\ZaloPayService;
@@ -26,6 +27,33 @@ class PaymentController extends Controller
         $this->momoService = $momoService;
         $this->vietqrService = $vietqrService;
         $this->zalopayService = $zalopayService;
+    }
+
+    /**
+     * Trừ số lượng phòng còn lại khi thanh toán thành công
+     */
+    private function decrementRoomAvailability(Order $order)
+    {
+        if (!$order->items || !is_array($order->items)) {
+            return;
+        }
+
+        foreach ($order->items as $item) {
+            // Chỉ trừ khi là hotel room
+            if (($item['type'] ?? null) === 'hotel' && isset($item['roomId'])) {
+                $room = Room::find($item['roomId']);
+                if ($room && $room->available > 0) {
+                    $quantity = $item['quantity'] ?? 1;
+                    $room->decrement('available', $quantity);
+                    \Log::info("Room availability decremented", [
+                        'room_id' => $room->id,
+                        'quantity' => $quantity,
+                        'available_before' => $room->available + $quantity,
+                        'available_after' => $room->available - $quantity,
+                    ]);
+                }
+            }
+        }
     }
 
     /**
@@ -350,6 +378,9 @@ class PaymentController extends Controller
                     'completed_at' => now(),
                 ]);
 
+                // Trừ số lượng phòng khách sạn
+                $this->decrementRoomAvailability($order);
+
                 return response()->json(['status' => true]);
             } else {
                 // Thanh toán thất bại
@@ -403,6 +434,9 @@ class PaymentController extends Controller
                     'status' => 'completed',
                     'completed_at' => now(),
                 ]);
+
+                // Trừ số lượng phòng khách sạn
+                $this->decrementRoomAvailability($order);
 
                 return response()->json([
                     'status' => true,
@@ -562,6 +596,9 @@ class PaymentController extends Controller
                     'status' => 'completed',
                     'completed_at' => now(),
                 ]);
+
+                // Trừ số lượng phòng khách sạn
+                $this->decrementRoomAvailability($order);
 
                 \Log::info('ZaloPay payment success', ['order_id' => $order->id, 'payment_id' => $payment->id]);
 
@@ -765,6 +802,9 @@ class PaymentController extends Controller
                     'status' => 'completed',
                     'completed_at' => now(),
                 ]);
+
+                // Trừ số lượng phòng khách sạn
+                $this->decrementRoomAvailability($order);
 
                 return response()->json([
                     'status' => true,

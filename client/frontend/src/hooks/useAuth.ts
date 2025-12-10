@@ -2,12 +2,14 @@ import { useEffect, useState } from "react";
 import { getCurrentUser, logout as apiLogout } from "@/api/auth";
 import { toast } from "@/hooks/use-toast";
 import { useCart } from "./useCart";
+import { useFavorites } from "./useFavorites";
 
 export function useAuth() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const { loadFromServer, clearCart } = useCart();
+  const { reset: resetFavorites } = useFavorites();
 
   useEffect(() => {
     const initAuth = async () => {
@@ -31,6 +33,7 @@ export function useAuth() {
           setLoading(false);
           setIsLoggedIn(false);
           clearCart();
+          resetFavorites();
           return;
         }
 
@@ -57,6 +60,7 @@ export function useAuth() {
           setUser(null);
           setIsLoggedIn(false);
           clearCart();
+          resetFavorites();
         }
       } finally {
         setLoading(false);
@@ -72,6 +76,7 @@ export function useAuth() {
       localStorage.removeItem("token");
       localStorage.removeItem("user");
       clearCart();
+      resetFavorites();
       setUser(null);
       setIsLoggedIn(false);
       toast({ title: "Đăng xuất thành công" });

@@ -113,6 +113,8 @@ export default function HotelDetail() {
   const [rooms, setRooms] = useState(1);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [showBookingForm, setShowBookingForm] = useState(false);
+  const [openCheckInPopover, setOpenCheckInPopover] = useState(false);
+  const [openCheckOutPopover, setOpenCheckOutPopover] = useState(false);
   const [bookingData, setBookingData] = useState({
     firstName: '',
     lastName: '',
@@ -141,6 +143,10 @@ export default function HotelDetail() {
       try {
         const res = await hotelApi.getById(id);
         const data = (res as any).data;
+        
+        // Log data để debug
+        console.log('Hotel data from API:', data);
+        
         // Normalize API response (snake_case -> camelCase, group policies)
         const mapped = {
           id: data.id,
@@ -149,25 +155,32 @@ export default function HotelDetail() {
           rating: data.rating,
           price: data.price,
           originalPrice: data.original_price ?? data.originalPrice,
-          images: data.images ?? (data.image ? [data.image] : []),
-          image: data.image ?? (data.images && data.images.length ? data.images[0] : undefined),
-          amenities: data.amenities ?? [],
+          images: Array.isArray(data.images) ? data.images : (data.image ? [data.image] : []),
+          image: data.image ?? (Array.isArray(data.images) && data.images.length ? data.images[0] : undefined),
+          amenities: Array.isArray(data.amenities) ? data.amenities : (typeof data.amenities === 'string' ? JSON.parse(data.amenities) : []),
           description: data.description ?? '',
           reviews: data.reviews ?? 0,
-          rooms: (data.rooms ?? []).map((r: any) => ({
-            id: r.id,
-            hotel_id: r.hotel_id,
-            name: r.name,
-            size: r.size,
-            capacity: r.capacity,
-            beds: r.beds,
-            price: r.price,
-            originalPrice: r.original_price ?? r.originalPrice,
-            amenities: r.amenities ?? [],
-            images: r.images ?? (r.image ? [r.image] : []),
-            description: r.description ?? '',
-            available: r.available ?? 0,
-          })),
+          rooms: (data.rooms ?? []).map((r: any) => {
+            try {
+              return {
+                id: r.id,
+                hotel_id: r.hotel_id,
+                name: r.name,
+                size: r.size ?? null,
+                capacity: r.capacity,
+                beds: r.beds ?? '',
+                price: r.price,
+                originalPrice: r.original_price ?? r.originalPrice,
+                amenities: Array.isArray(r.amenities) ? r.amenities : (typeof r.amenities === 'string' ? JSON.parse(r.amenities) : []),
+                images: Array.isArray(r.images) ? r.images : (r.image ? [r.image] : []),
+                description: r.description ?? '',
+                available: r.available ?? 0,
+              };
+            } catch (roomError) {
+              console.error('Error mapping room:', r, roomError);
+              return null;
+            }
+          }).filter((room: any) => room !== null),
           policies: {
             checkIn: data.check_in ?? data.checkIn ?? '',
             checkOut: data.check_out ?? data.checkOut ?? '',
@@ -176,9 +189,15 @@ export default function HotelDetail() {
           },
         } as Hotel;
 
+        console.log('Mapped hotel data:', mapped);
         setHotelData(mapped);
       } catch (err) {
         console.error('Failed to fetch hotel', err);
+        toast({
+          title: 'Lỗi',
+          description: 'Không thể tải thông tin khách sạn',
+          variant: 'destructive'
+        });
       }
     })();
   }, [id]);
@@ -338,7 +357,7 @@ export default function HotelDetail() {
               <div className="grid grid-cols-2 gap-2">
                 <div>
                   <label className="text-sm font-medium mb-1 block">Nhận phòng</label>
-                  <Popover>
+                  <Popover open={openCheckInPopover} onOpenChange={setOpenCheckInPopover}>
                     <PopoverTrigger asChild>
                       <Button
                         variant="outline"
@@ -355,7 +374,12 @@ export default function HotelDetail() {
                       <Calendar
                         mode="single"
                         selected={checkIn}
-                        onSelect={setCheckIn}
+                        onSelect={(date) => {
+                          if (date) {
+                            setCheckIn(date);
+                            setOpenCheckInPopover(false);
+                          }
+                        }}
                         disabled={(date) => date < new Date()}
                         initialFocus
                       />
@@ -364,7 +388,7 @@ export default function HotelDetail() {
                 </div>
                 <div>
                   <label className="text-sm font-medium mb-1 block">Trả phòng</label>
-                  <Popover>
+                  <Popover open={openCheckOutPopover} onOpenChange={setOpenCheckOutPopover}>
                     <PopoverTrigger asChild>
                       <Button
                         variant="outline"
@@ -381,8 +405,26 @@ export default function HotelDetail() {
                       <Calendar
                         mode="single"
                         selected={checkOut}
-                        onSelect={setCheckOut}
-                        disabled={(date) => date < new Date() || (checkIn && date <= checkIn)}
+                        onSelect={(date) => {
+                          try {
+                            if (date) {
+                              setCheckOut(date);
+                              setTimeout(() => setOpenCheckOutPopover(false), 100);
+                            }
+                          } catch (error) {
+                            console.error('Error setting checkout date:', error);
+                          }
+                        }}
+                        disabled={(date) => {
+                          try {
+                            if (date < new Date()) return true;
+                            if (checkIn && date <= checkIn) return true;
+                            return false;
+                          } catch (error) {
+                            console.error('Error in disabled check:', error);
+                            return false;
+                          }
+                        }}
                         initialFocus
                       />
                     </PopoverContent>
@@ -617,53 +659,6 @@ export default function HotelDetail() {
 
                                     {/* Guest Information */}
                                     <div className="space-y-4">
-                                      <h3 className="font-semibold flex items-center">
-                                        <User className="h-5 w-5 mr-2" />
-                                        Thông tin khách hàng
-                                      </h3>
-                                      <div className="grid grid-cols-2 gap-4">
-                                        <div>
-                                          <label className="text-sm font-medium mb-1 block">Họ *</label>
-                                          <Input
-                                            name="firstName"
-                                            value={bookingData.firstName}
-                                            onChange={handleInputChange}
-                                            placeholder="Nhập họ"
-                                            required
-                                          />
-                                        </div>
-                                        <div>
-                                          <label className="text-sm font-medium mb-1 block">Tên *</label>
-                                          <Input
-                                            name="lastName"
-                                            value={bookingData.lastName}
-                                            onChange={handleInputChange}
-                                            placeholder="Nhập tên"
-                                            required
-                                          />
-                                        </div>
-                                      </div>
-                                      <div>
-                                        <label className="text-sm font-medium mb-1 block">Email *</label>
-                                        <Input
-                                          name="email"
-                                          type="email"
-                                          value={bookingData.email}
-                                          onChange={handleInputChange}
-                                          placeholder="Nhập email"
-                                          required
-                                        />
-                                      </div>
-                                      <div>
-                                        <label className="text-sm font-medium mb-1 block">Số điện thoại *</label>
-                                        <Input
-                                          name="phone"
-                                          value={bookingData.phone}
-                                          onChange={handleInputChange}
-                                          placeholder="Nhập số điện thoại"
-                                          required
-                                        />
-                                      </div>
                                       <div>
                                         <label className="text-sm font-medium mb-1 block">Yêu cầu đặc biệt</label>
                                         <textarea
@@ -676,41 +671,12 @@ export default function HotelDetail() {
                                         />
                                       </div>
                                     </div>
-
-                                    {/* Payment Method */}
-                                    <div className="space-y-4">
-                                      <h3 className="font-semibold flex items-center">
-                                        <CreditCard className="h-5 w-5 mr-2" />
-                                        Phương thức thanh toán
-                                      </h3>
-                                      <div className="space-y-2">
-                                        <label className="flex items-center space-x-2">
-                                          <input type="radio" name="payment" value="card" defaultChecked />
-                                          <span>Thẻ tín dụng/ghi nợ</span>
-                                        </label>
-                                        <label className="flex items-center space-x-2">
-                                          <input type="radio" name="payment" value="transfer" />
-                                          <span>Chuyển khoản ngân hàng</span>
-                                        </label>
-                                        <label className="flex items-center space-x-2">
-                                          <input type="radio" name="payment" value="cash" />
-                                          <span>Thanh toán tại khách sạn</span>
-                                        </label>
-                                      </div>
-                                    </div>
-
                                     {/* Terms */}
                                     <div className="space-y-2">
                                       <label className="flex items-start space-x-2">
                                         <input type="checkbox" required className="mt-1" />
                                         <span className="text-sm text-gray-600">
                                           Tôi đồng ý với <a href="#" className="text-blue-600 hover:underline">điều khoản và điều kiện</a> của khách sạn
-                                        </span>
-                                      </label>
-                                      <label className="flex items-start space-x-2">
-                                        <input type="checkbox" className="mt-1" />
-                                        <span className="text-sm text-gray-600">
-                                          Tôi muốn nhận thông tin khuyến mãi qua email
                                         </span>
                                       </label>
                                     </div>

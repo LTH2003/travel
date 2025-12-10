@@ -183,9 +183,9 @@ export default function Checkout() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 flex flex-col">
       <Header />
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8 flex-grow">
         <h1 className="text-3xl font-bold text-gray-900 mb-8">Thanh toán</h1>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -420,8 +420,8 @@ export default function Checkout() {
             </Card>
           </div>
         </div>
-        <Footer />
       </div>
+      <Footer />
     </div>
   );
 }

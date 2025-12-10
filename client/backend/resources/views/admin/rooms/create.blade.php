@@ -91,62 +91,60 @@
                                 </div>
                             </div>
 
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="bed_type" class="form-label fw-bold">Bed Type</label>
-                                    <select name="bed_type" id="bed_type" class="form-select @error('bed_type') is-invalid @enderror">
-                                        <option value="">-- Select Bed Type --</option>
-                                        <option value="Single" {{ old('bed_type') === 'Single' ? 'selected' : '' }}>🛏️ Single</option>
-                                        <option value="Double" {{ old('bed_type') === 'Double' ? 'selected' : '' }}>🛏️ Double</option>
-                                        <option value="Queen" {{ old('bed_type') === 'Queen' ? 'selected' : '' }}>🛏️ Queen</option>
-                                        <option value="King" {{ old('bed_type') === 'King' ? 'selected' : '' }}>👑 King</option>
-                                        <option value="Twin" {{ old('bed_type') === 'Twin' ? 'selected' : '' }}>🛏️ Twin</option>
-                                        <option value="Multi-bed" {{ old('bed_type') === 'Multi-bed' ? 'selected' : '' }}>🛏️ Multi-bed</option>
-                                    </select>
-                                    @error('bed_type')
-                                        <div class="invalid-feedback d-block">{{ $message }}</div>
-                                    @enderror
+                            <!-- Advanced Details (Collapsible) -->
+                            <div class="card border-light mb-3">
+                                <div class="card-header bg-light">
+                                    <a class="card-link text-decoration-none" data-bs-toggle="collapse" href="#advancedDetails" role="button">
+                                        <i class="bi bi-chevron-down"></i> 
+                                        <strong>Thông tin chi tiết (Tùy chọn)</strong>
+                                    </a>
                                 </div>
-
-                                <div class="col-md-6 mb-3">
-                                    <label for="area" class="form-label fw-bold">Room Area <span class="text-muted">(m²)</span></label>
-                                    <input type="number" name="area" id="area" 
-                                           value="{{ old('area') }}" 
-                                           min="0" step="0.1"
-                                           class="form-control @error('area') is-invalid @enderror" 
-                                           placeholder="e.g., 25.5">
-                                    @error('area')
-                                        <div class="invalid-feedback d-block">{{ $message }}</div>
-                                    @enderror
+                                <div id="advancedDetails" class="collapse">
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label for="size" class="form-label">Diện tích phòng (m²)</label>
+                                                <input type="number" name="size" id="size" 
+                                                       value="{{ old('size') }}" 
+                                                       step="0.01" min="0"
+                                                       class="form-control @error('size') is-invalid @enderror" 
+                                                       placeholder="e.g., 35">
+                                                @error('size')
+                                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                                @enderror
+                                                <small class="text-muted d-block mt-1">
+                                                    💡 Nhập diện tích tính bằng mét vuông
+                                                </small>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label for="beds" class="form-label">Loại giường</label>
+                                                <input type="text" name="beds" id="beds" 
+                                                       value="{{ old('beds') }}" 
+                                                       class="form-control @error('beds') is-invalid @enderror" 
+                                                       placeholder="e.g., 1 giường đôi King, 1 giường đôi King + 1 sofa bed">
+                                                @error('beds')
+                                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                                @enderror
+                                                <small class="text-muted d-block mt-1">
+                                                    💡 Mô tả loại và số lượng giường trong phòng
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="bathroom" class="form-label fw-bold">Bathroom Type</label>
-                                    <input type="text" name="bathroom" id="bathroom" 
-                                           value="{{ old('bathroom') }}" 
-                                           class="form-control @error('bathroom') is-invalid @enderror"
-                                           placeholder="e.g., Private Bathroom, Shower & Tub">
-                                    @error('bathroom')
-                                        <div class="invalid-feedback d-block">{{ $message }}</div>
-                                    @enderror
-                                </div>
-
-                                <div class="col-md-6"></div>
                             </div>
                         </div>
 
                         <hr class="my-4">
 
-                        <!-- Section 2: Pricing -->
+                        <!-- Section 2: Pricing & Availability -->
                         <div class="mb-5">
                             <h6 class="text-uppercase fw-bold text-muted mb-3">
-                                <i class="bi bi-cash-coin me-2"></i> Pricing
+                                <i class="bi bi-cash-coin me-2"></i> Pricing & Availability
                             </h6>
                             
                             <div class="row">
-                                <div class="col-md-6 mb-3">
+                                <div class="col-md-4 mb-3">
                                     <label for="price" class="form-label fw-bold">
                                         Price per Night (VNĐ) <span class="text-danger">*</span>
                                     </label>
@@ -164,7 +162,7 @@
                                     </small>
                                 </div>
 
-                                <div class="col-md-6 mb-3">
+                                <div class="col-md-4 mb-3">
                                     <label for="original_price" class="form-label fw-bold">Original Price <span class="text-muted">(Optional)</span></label>
                                     <input type="number" name="original_price" id="original_price" 
                                            value="{{ old('original_price') }}" 
@@ -176,6 +174,24 @@
                                     @enderror
                                     <small class="text-muted d-block mt-1">
                                         For displaying original price when on sale
+                                    </small>
+                                </div>
+
+                                <div class="col-md-4 mb-3">
+                                    <label for="available" class="form-label fw-bold">
+                                        Số phòng còn lại <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="number" name="available" id="available" 
+                                           value="{{ old('available', 0) }}" 
+                                           min="0"
+                                           class="form-control @error('available') is-invalid @enderror" 
+                                           placeholder="e.g., 5"
+                                           required>
+                                    @error('available')
+                                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                                    @enderror
+                                    <small class="text-muted d-block mt-1">
+                                        💡 Số lượng phòng còn sẵn
                                     </small>
                                 </div>
                             </div>
@@ -223,50 +239,39 @@
                         <!-- Section 4: Images -->
                         <div class="mb-5">
                             <h6 class="text-uppercase fw-bold text-muted mb-3">
-                                <i class="bi bi-image me-2"></i> Image
+                                <i class="bi bi-image me-2"></i> Images
                             </h6>
                             
                             <div class="mb-3">
-                                <label for="image" class="form-label fw-bold">Image URL</label>
-                                <input type="text" name="image" id="image" 
-                                       value="{{ old('image') }}" 
-                                       class="form-control @error('image') is-invalid @enderror"
-                                       placeholder="https://example.com/image.jpg">
-                                @error('image')
+                                <label for="images" class="form-label fw-bold">Room Images (URLs)</label>
+                                <textarea name="images" id="images" rows="4" 
+                                          class="form-control @error('images') is-invalid @enderror"
+                                          placeholder='Enter image URLs as JSON array: ["https://example.com/image1.jpg", "https://example.com/image2.jpg"]'>{{ old('images') }}</textarea>
+                                @error('images')
                                     <div class="invalid-feedback d-block">{{ $message }}</div>
                                 @enderror
                                 <small class="text-muted d-block mt-1">
-                                    Preview will appear below after you enter a valid image URL
+                                    <i class="bi bi-info-circle me-1"></i> Enter as JSON array of image URLs
                                 </small>
                             </div>
+                        </div>
 
-                            <!-- Image Preview -->
-                            <div id="imagePreview" class="card bg-light border-0 d-none">
-                                <div class="card-body p-3">
-                                    <small class="text-muted d-block mb-2">Image Preview:</small>
-                                    <img id="previewImg" src="" alt="Preview" 
-                                         class="img-fluid rounded" style="max-height: 250px; max-width: 100%;">
-                                </div>
+                        <!-- Form Buttons -->
+                        <hr class="my-4">
+                        <div class="d-flex gap-2 justify-content-between">
+                            <a href="{{ route('admin.hotels.rooms.index', $hotel) }}" class="btn btn-secondary">
+                                <i class="bi bi-x-circle me-2"></i> Hủy
+                            </a>
+                            <div>
+                                <button type="reset" class="btn btn-outline-secondary me-2">
+                                    <i class="bi bi-arrow-clockwise me-2"></i> Đặt lại
+                                </button>
+                                <button type="submit" class="btn btn-success">
+                                    <i class="bi bi-check-circle me-2"></i> Tạo Phòng
+                                </button>
                             </div>
                         </div>
                     </form>
-                </div>
-
-                <!-- Card Footer with Buttons -->
-                <div class="card-footer bg-light border-top">
-                    <div class="d-flex gap-2 justify-content-between">
-                        <a href="{{ route('admin.hotels.rooms.index', $hotel) }}" class="btn btn-secondary">
-                            <i class="bi bi-x-circle me-2"></i> Cancel
-                        </a>
-                        <div>
-                            <button type="reset" form="roomForm" class="btn btn-outline-secondary me-2">
-                                <i class="bi bi-arrow-clockwise me-2"></i> Reset
-                            </button>
-                            <button type="submit" form="roomForm" class="btn btn-success">
-                                <i class="bi bi-check-circle me-2"></i> Create Room
-                            </button>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -277,12 +282,12 @@
             <div class="card shadow-sm border-0 mb-4">
                 <div class="card-header bg-info bg-opacity-10 border-info border-bottom">
                     <h6 class="mb-0">
-                        <i class="bi bi-building text-info me-2"></i> Hotel Information
+                        <i class="bi bi-building text-info me-2"></i> Thông tin Khách sạn
                     </h6>
                 </div>
                 <div class="card-body">
                     <div class="mb-3">
-                        <small class="text-muted d-block">Hotel Name</small>
+                        <small class="text-muted d-block">Tên Khách sạn</small>
                         <strong>
                             <a href="{{ route('admin.hotels.show', $hotel) }}" class="text-decoration-none">
                                 {{ $hotel->name }}
@@ -290,15 +295,15 @@
                         </strong>
                     </div>
                     <div class="mb-3">
-                        <small class="text-muted d-block">Location</small>
+                        <small class="text-muted d-block">Địa điểm</small>
                         <strong>{{ Str::limit($hotel->location, 50) }}</strong>
                     </div>
                     <div class="mb-3">
-                        <small class="text-muted d-block">Current Rooms</small>
-                        <strong>{{ $hotel->rooms_count ?? 0 }} rooms</strong>
+                        <small class="text-muted d-block">Phòng hiện tại</small>
+                        <strong>{{ $hotel->rooms_count ?? 0 }} phòng</strong>
                     </div>
                     <div class="mb-0">
-                        <small class="text-muted d-block">Rating</small>
+                        <small class="text-muted d-block">Đánh giá</small>
                         <strong>{{ $hotel->rating }}/5.0 ⭐</strong>
                     </div>
                 </div>
@@ -308,25 +313,25 @@
             <div class="card shadow-sm border-0 mb-4">
                 <div class="card-header bg-warning bg-opacity-10 border-warning border-bottom">
                     <h6 class="mb-0">
-                        <i class="bi bi-lightbulb text-warning me-2"></i> Tips & Help
+                        <i class="bi bi-lightbulb text-warning me-2"></i> Mẹo & Hướng dẫn
                     </h6>
                 </div>
                 <div class="card-body">
                     <div class="mb-3">
-                        <strong class="d-block mb-2">✅ Required Fields</strong>
-                        <small class="text-muted">Room Name, Price, and Capacity are mandatory</small>
+                        <strong class="d-block mb-2">✅ Trường bắt buộc</strong>
+                        <small class="text-muted">Tên phòng, Giá và Sức chứa là bắt buộc</small>
                     </div>
                     <div class="mb-3">
-                        <strong class="d-block mb-2">💰 Pricing Tips</strong>
-                        <small class="text-muted">Set original price higher to show discount percentage to customers</small>
+                        <strong class="d-block mb-2">💰 Mẹo Giá</strong>
+                        <small class="text-muted">Đặt giá gốc cao hơn để hiển thị % giảm giá cho khách</small>
                     </div>
                     <div class="mb-3">
-                        <strong class="d-block mb-2">🎨 Amenities Format</strong>
-                        <small class="text-muted">Use JSON array format:<br><code>["WiFi", "TV", "AC"]</code></small>
+                        <strong class="d-block mb-2">🎨 Định dạng Tiện nghi</strong>
+                        <small class="text-muted">Sử dụng định dạng JSON array:<br><code>["WiFi", "TV", "AC"]</code></small>
                     </div>
                     <div class="mb-0">
-                        <strong class="d-block mb-2">🖼️ Image Quality</strong>
-                        <small class="text-muted">Use high-quality images (JPG/PNG, 300x300px recommended)</small>
+                        <strong class="d-block mb-2">🖼️ Chất lượng Ảnh</strong>
+                        <small class="text-muted">Dùng ảnh chất lượng cao (JPG/PNG, 300x300px)</small>
                     </div>
                 </div>
             </div>

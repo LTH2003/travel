@@ -52,8 +52,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin_or_manager'])
         Route::resource('hotels', AdminHotelController::class);
     });
 
-    // Rooms management (chỉ admin)
-    Route::middleware('admin')->group(function () {
+    // Rooms management (admin và hotel_manager)
+    Route::middleware('admin_or_manager')->group(function () {
         Route::resource('hotels.rooms', AdminRoomController::class);
     });
 

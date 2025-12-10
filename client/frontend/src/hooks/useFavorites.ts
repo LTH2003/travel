@@ -9,6 +9,7 @@ export interface FavoritesStore {
   isFavorited: (type: 'hotel' | 'tour', id: number) => boolean;
   loadFavorites: () => Promise<void>;
   checkAndLoad: (type: 'hotel' | 'tour', id: number) => Promise<boolean>;
+  reset: () => void;  // 🔄 Thêm hàm reset để xóa cache khi logout
 }
 
 export const useFavorites = create<FavoritesStore>((set, get) => ({
@@ -83,5 +84,10 @@ export const useFavorites = create<FavoritesStore>((set, get) => ({
       console.error('Lỗi khi kiểm tra yêu thích:', error);
       return false;
     }
+  },
+
+  // 🔄 Reset state khi user logout
+  reset: () => {
+    set({ hotelIds: [], tourIds: [] });
   },
 }));

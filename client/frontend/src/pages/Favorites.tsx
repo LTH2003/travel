@@ -32,11 +32,12 @@ interface TourFavorite {
 }
 
 let favoritesCacheData: any = null;
+let cachedUserId: number | null = null;
 
 export default function Favorites() {
   useTitle('Yêu thích - TravelVN');
   const navigate = useNavigate();
-  const { isLoggedIn, loading: authLoading } = useAuth();
+  const { isLoggedIn, loading: authLoading, user } = useAuth();
   const { loadFavorites, removeFavorite } = useFavorites();
   const [hotels, setHotels] = useState<HotelFavorite[]>([]);
   const [tours, setTours] = useState<TourFavorite[]>([]);
@@ -58,8 +59,14 @@ export default function Favorites() {
       try {
         setLoading(true);
         
-        // 🚀 Use cached data if available, only refetch if cache is empty
-        if (favoritesCacheData) {
+        // 🚀 Reset cache nếu user thay đổi (đăng nhập account khác)
+        if (user && cachedUserId !== user.id) {
+          favoritesCacheData = null;
+          cachedUserId = user.id;
+        }
+        
+        // Use cached data if available and user hasn't changed
+        if (favoritesCacheData && cachedUserId === user?.id) {
           setHotels(favoritesCacheData.hotels || []);
           setTours(favoritesCacheData.tours || []);
           setLoading(false);
@@ -71,6 +78,9 @@ export default function Favorites() {
         
         // Cache the data for subsequent visits
         favoritesCacheData = favoritesData;
+        if (user) {
+          cachedUserId = user.id;
+        }
         
         setHotels(favoritesData.hotels || []);
         setTours(favoritesData.tours || []);
@@ -87,7 +97,7 @@ export default function Favorites() {
     };
 
     fetchFavorites();
-  }, [isLoggedIn, authLoading, navigate]);
+  }, [isLoggedIn, authLoading, navigate, user?.id]);
 
   const handleRemoveFavorite = async (type: 'hotel' | 'tour', id: number) => {
     try {
@@ -127,9 +137,9 @@ export default function Favorites() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 flex flex-col">
       <Header />
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8 flex-grow">
         {/* Breadcrumb */}
         <div className="flex items-center space-x-2 text-sm text-gray-600 mb-6">
           <Link to="/" className="hover:text-blue-600 flex items-center">
@@ -294,8 +304,8 @@ export default function Favorites() {
             )}
         </>
         )}
-        <Footer />
       </div>
+      <Footer />
     </div>
   );
 }
