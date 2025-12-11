@@ -68,6 +68,40 @@ class Tour extends Model
         ]);
     }
 
+    /**
+     * Get itinerary attribute - transform objects to strings
+     * Handles both old format (array of objects) and new format (array of strings)
+     */
+    public function getItineraryAttribute($value)
+    {
+        if (!$value) {
+            return [];
+        }
+
+        $itinerary = is_string($value) ? json_decode($value, true) : $value;
+        
+        if (!is_array($itinerary) || empty($itinerary)) {
+            return [];
+        }
+
+        // Transform itinerary items
+        $transformed = array_map(function($item) {
+            // If it's an object-like array with 'day' and 'title' keys (old format)
+            if (is_array($item) && isset($item['day']) && isset($item['title'])) {
+                $day = trim($item['day'] ?? '');
+                $title = trim($item['title'] ?? '');
+                $combined = trim("$day: $title");
+                return !empty($combined) ? $combined : null;
+            }
+            // Otherwise treat as string
+            $str = trim((string)$item);
+            return !empty($str) ? $str : null;
+        }, $itinerary);
+
+        // Remove null/empty values and reindex
+        return array_values(array_filter($transformed, fn($item) => $item !== null));
+    }
+
     public function favorites()
     {
         return $this->morphMany(Favorite::class, 'favoritable');

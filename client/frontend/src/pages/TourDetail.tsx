@@ -327,12 +327,27 @@ export default function TourDetail() {
                   <CardContent>
                     {Array.isArray(tour.itinerary) && tour.itinerary.length > 0 ? (
                       <ul className="space-y-3 text-gray-600">
-                        {tour.itinerary.map((item: string, index: number) => (
-                          <li key={index} className="flex items-start space-x-2">
-                            <span className="text-orange-600 font-semibold">•</span>
-                            <span>{item}</span>
-                          </li>
-                        ))}
+                        {tour.itinerary.map((item: any, index: number) => {
+                          // Handle both string and object formats
+                          let displayText = '';
+                          if (typeof item === 'string') {
+                            displayText = item;
+                          } else if (item && typeof item === 'object') {
+                            // Old format: {day, title, activities}
+                            const day = item.day || '';
+                            const title = item.title || '';
+                            displayText = `${day}: ${title}`.trim();
+                          } else {
+                            displayText = String(item);
+                          }
+                          
+                          return displayText ? (
+                            <li key={index} className="flex items-start space-x-2">
+                              <span className="text-orange-600 font-semibold">•</span>
+                              <span>{displayText}</span>
+                            </li>
+                          ) : null;
+                        })}
                       </ul>
                     ) : (
                       <p className="text-gray-500">Chưa có lịch trình</p>
