@@ -166,12 +166,7 @@
             </table>
         </div>
 
-        <!-- Pagination -->
-        @if($bookings->hasPages())
-            <div class="card-footer">
-                {{ $bookings->links() }}
-            </div>
-        @endif
+
     </div>
 </div>
 
