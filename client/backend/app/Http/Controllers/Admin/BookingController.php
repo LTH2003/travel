@@ -8,6 +8,7 @@ use App\Models\BookingDetail;
 use App\Models\Room;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class BookingController extends Controller
 {
@@ -120,5 +121,52 @@ class BookingController extends Controller
             
             return back()->with('success', 'Xóa booking thành công và hoàn trả phòng');
         });
+    }
+
+    /**
+     * Export bookings as PDF
+     */
+    public function exportPdf(Request $request)
+    {
+        $search = $request->query('search', '');
+        $status = $request->query('status', '');
+
+        $query = Order::with(['user', 'bookingDetails'])
+            ->orderBy('created_at', 'desc');
+
+        // Apply same filters as index
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('order_code', 'like', "%{$search}%")
+                  ->orWhereHas('user', function ($userQ) use ($search) {
+                      $userQ->where('name', 'like', "%{$search}%")
+                            ->orWhere('email', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        if ($status && in_array($status, ['pending', 'completed'])) {
+            $query->where('status', $status);
+        }
+
+        $bookings = $query->get();
+
+        // Calculate statistics
+        $stats = [
+            'total_count' => $bookings->count(),
+            'total_revenue' => $bookings->where('status', 'completed')->sum('total_amount'),
+            'completed_count' => $bookings->where('status', 'completed')->count(),
+            'pending_count' => $bookings->where('status', 'pending')->count(),
+        ];
+
+        $pdf = Pdf::loadView('admin.bookings.export-pdf', [
+            'bookings' => $bookings,
+            'stats' => $stats,
+            'search' => $search,
+            'status' => $status,
+            'export_date' => now()->format('d/m/Y H:i:s'),
+        ]);
+
+        return $pdf->download('bookings-' . date('Y-m-d-His') . '.pdf');
     }
 }

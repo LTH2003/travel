@@ -94,6 +94,11 @@
                         <i class="bi bi-arrow-clockwise"></i>
                     </a>
                 </div>
+                <div class="col-md-2">
+                    <button type="button" class="btn btn-warning w-100" id="exportPdfBtn">
+                        <i class="bi bi-file-pdf"></i> Xuất PDF
+                    </button>
+                </div>
             </form>
         </div>
     </div>
@@ -208,4 +213,28 @@
         box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.075);
     }
 </style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const exportPdfBtn = document.getElementById('exportPdfBtn');
+    
+    if (exportPdfBtn) {
+        exportPdfBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Get current filter values
+            const search = new URLSearchParams(window.location.search).get('search') || '';
+            const status = new URLSearchParams(window.location.search).get('status') || '';
+            
+            // Build query string
+            let queryString = '?';
+            if (search) queryString += 'search=' + encodeURIComponent(search) + '&';
+            if (status) queryString += 'status=' + encodeURIComponent(status) + '&';
+            
+            // Redirect to PDF export endpoint
+            window.location.href = '{{ route("admin.bookings.exportPdf") }}' + queryString;
+        });
+    }
+});
+</script>
 @endsection

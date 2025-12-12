@@ -61,6 +61,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin_or_manager'])
     // Bookings management (chỉ admin)
     Route::middleware('admin')->group(function () {
         Route::get('bookings', [AdminBookingController::class, 'index'])->name('bookings.index');
+        Route::get('bookings/export-pdf', [AdminBookingController::class, 'exportPdf'])->name('bookings.exportPdf');
         Route::get('bookings/{id}', [AdminBookingController::class, 'show'])->name('bookings.show');
         Route::put('bookings/{id}/status', [AdminBookingController::class, 'updateStatus'])->name('bookings.updateStatus');
         Route::delete('bookings/{id}', [AdminBookingController::class, 'destroy'])->name('bookings.destroy');
