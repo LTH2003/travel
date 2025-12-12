@@ -18,6 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'admin_or_manager' => \App\Http\Middleware\IsAdminOrManager::class,
             'tour_manager' => \App\Http\Middleware\IsTourManager::class,
             'hotel_manager' => \App\Http\Middleware\IsHotelManager::class,
+            'receptionist' => \App\Http\Middleware\IsReceptionist::class,
             'auth_sanctum_api' => \App\Http\Middleware\AuthSanctumApi::class,
         ]);
     })

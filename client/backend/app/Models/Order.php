@@ -18,6 +18,8 @@ class Order extends Model
         'items',
         'notes',
         'completed_at',
+        'checked_in_at',
+        'qr_code',
         'email_sent_at',
     ];
 
@@ -25,6 +27,7 @@ class Order extends Model
         'items' => 'json',
         'total_amount' => 'decimal:2',
         'completed_at' => 'datetime',
+        'checked_in_at' => 'datetime',
         'email_sent_at' => 'datetime',
     ];
 

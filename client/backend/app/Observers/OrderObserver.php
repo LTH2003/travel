@@ -4,6 +4,7 @@ namespace App\Observers;
 
 use App\Models\Order;
 use App\Models\BookingDetail;
+use App\Models\PurchaseHistory;
 use App\Models\Room;
 use App\Mail\BookingConfirmationMail;
 use Illuminate\Support\Facades\Mail;
@@ -35,6 +36,10 @@ class OrderObserver
             if ($previousStatus !== 'completed' && $currentStatus === 'completed') {
                 \Log::info('Calling decreaseAvailableRooms', ['order_id' => $order->id]);
                 $this->decreaseAvailableRooms($order);
+                
+                // Create purchase history records
+                \Log::info('Creating purchase history', ['order_id' => $order->id]);
+                $this->createPurchaseHistory($order);
                 
                 // Send email khi đơn hàng hoàn tất
                 if (!$order->email_sent_at) {
@@ -332,4 +337,48 @@ class OrderObserver
             ]);
         }
     }
+
+    /**
+     * Create purchase history records for completed order
+     */
+    private function createPurchaseHistory(Order $order): void
+    {
+        try {
+            $bookingDetails = BookingDetail::where('order_id', $order->id)->get();
+            
+            if ($bookingDetails->isEmpty()) {
+                \Log::warning('No booking details found for purchase history', ['order_id' => $order->id]);
+                return;
+            }
+
+            foreach ($bookingDetails as $detail) {
+                $itemName = 'Unknown';
+                if ($detail->booking_info && isset($detail->booking_info['name'])) {
+                    $itemName = $detail->booking_info['name'];
+                }
+                
+                PurchaseHistory::create([
+                    'user_id' => $order->user_id,
+                    'order_id' => $order->id,
+                    'item_type' => $detail->bookable_type,
+                    'item_id' => $detail->bookable_id,
+                    'item_name' => $itemName,
+                    'amount' => $detail->price,
+                    'status' => 'confirmed',
+                    'purchased_at' => now(),
+                ]);
+            }
+
+            \Log::info('Purchase history created', [
+                'order_id' => $order->id,
+                'count' => $bookingDetails->count(),
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Failed to create purchase history', [
+                'order_id' => $order->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
 }
+

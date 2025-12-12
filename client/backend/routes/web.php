@@ -11,22 +11,23 @@ use App\Http\Controllers\Admin\HotelController as AdminHotelController;
 use App\Http\Controllers\Admin\RoomController as AdminRoomController;
 use App\Http\Controllers\Admin\BookingController as AdminBookingController;
 use App\Http\Controllers\Admin\ContactController as AdminContactController;
+use App\Http\Controllers\ReceptionistController;
 
 Route::get('/', function () {
     return view('admin.auth.login');
 });
 
-// ===== LOGIN ROUTES (không cần auth) =====
+// ===== LOGIN & LOGOUT ROUTES (không cần admin_or_manager) =====
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('login', [AuthController::class, 'showLogin'])->name('login');
     Route::post('login', [AuthController::class, 'login'])->name('login.store');
+    Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 });
 
 // ===== PROTECTED ADMIN ROUTES (cần auth + admin/tour_manager/hotel_manager role) =====
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin_or_manager'])->group(function () {
     // Dashboard
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 
     // Users management (chỉ admin)
     Route::middleware('admin')->group(function () {
@@ -71,5 +72,13 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin_or_manager'])
         Route::post('contacts/{contact}/send-cancellation-email', [AdminContactController::class, 'sendCancellationEmail'])->name('contacts.send-cancellation-email');
         Route::post('contacts/{contact}/send-reply-email', [AdminContactController::class, 'sendReplyEmail'])->name('contacts.send-reply-email');
     });
+});
+
+// ===== RECEPTIONIST ROUTES (chỉ dành cho lễ tân) =====
+Route::middleware(['auth', 'receptionist'])->group(function () {
+    Route::get('receptionist', [ReceptionistController::class, 'dashboard'])->name('receptionist.dashboard');
+    Route::post('receptionist/check-in', [ReceptionistController::class, 'checkIn'])->name('receptionist.checkIn');
+    Route::get('receptionist/checked-in-list', [ReceptionistController::class, 'getCheckedInList'])->name('receptionist.getCheckedInList');
+    Route::get('receptionist/export-pdf', [ReceptionistController::class, 'exportPDF'])->name('receptionist.exportPDF');
 });
 

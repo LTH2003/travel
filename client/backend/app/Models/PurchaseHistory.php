@@ -9,6 +9,8 @@ class PurchaseHistory extends Model
 {
     use HasFactory;
 
+    protected $table = 'purchase_history';
+
     protected $fillable = [
         'user_id',
         'order_id',

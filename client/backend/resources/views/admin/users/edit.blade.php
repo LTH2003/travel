@@ -80,6 +80,7 @@
                             <option value="admin" {{ old('role', $user->role) === 'admin' ? 'selected' : '' }}>Admin</option>
                             <option value="tour_manager" {{ old('role', $user->role) === 'tour_manager' ? 'selected' : '' }}>Tour Manager</option>
                             <option value="hotel_manager" {{ old('role', $user->role) === 'hotel_manager' ? 'selected' : '' }}>Hotel Manager</option>
+                            <option value="receptionist" {{ old('role', $user->role) === 'receptionist' ? 'selected' : '' }}>Lễ Tân</option>
                         </select>
                         @error('role')
                             <small class="text-danger">{{ $message }}</small>

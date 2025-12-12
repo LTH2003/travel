@@ -1,0 +1,141 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Order;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Barryvdh\DomPDF\Facade\Pdf;
+
+class ReceptionistController extends Controller
+{
+    /**
+     * Show receptionist dashboard
+     */
+    public function dashboard()
+    {
+        // Get today's checked-in orders
+        $checkedInToday = Order::whereNotNull('checked_in_at')
+            ->whereDate('checked_in_at', today())
+            ->with('user')
+            ->orderBy('checked_in_at', 'desc')
+            ->get();
+
+        return view('receptionist.dashboard', [
+            'checkedInToday' => $checkedInToday,
+            'checkedInCount' => $checkedInToday->count()
+        ]);
+    }
+
+    /**
+     * Check in a customer by QR code or order ID
+     */
+    public function checkIn(Request $request)
+    {
+        try {
+            $request->validate([
+                'qr_code' => 'required|string'
+            ]);
+
+            // Find order by QR code or order_code
+            $order = Order::where('qr_code', $request->qr_code)
+                ->orWhere('order_code', $request->qr_code)
+                ->first();
+
+            if (!$order) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Không tìm thấy đơn hàng với mã QR này'
+                ], 404);
+            }
+
+            // Check if already checked in
+            if ($order->checked_in_at) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Khách hàng đã check-in lúc ' . $order->checked_in_at->format('H:i d/m/Y'),
+                    'alreadyCheckedIn' => true
+                ]);
+            }
+
+            // Update checked_in_at timestamp
+            $order->checked_in_at = now();
+            $order->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Check-in thành công cho ' . $order->user->name,
+                'order' => [
+                    'id' => $order->id,
+                    'order_code' => $order->order_code,
+                    'customer_name' => $order->user->name,
+                    'checked_in_at' => $order->checked_in_at->format('H:i d/m/Y')
+                ]
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Lỗi: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Get today's checked-in list (for table refresh)
+     */
+    public function getCheckedInList()
+    {
+        $checkedInToday = Order::whereNotNull('checked_in_at')
+            ->whereDate('checked_in_at', today())
+            ->with('user')
+            ->orderBy('checked_in_at', 'desc')
+            ->get()
+            ->map(function ($order) {
+                return [
+                    'id' => $order->id,
+                    'order_code' => $order->order_code,
+                    'customer_name' => $order->user->name,
+                    'customer_phone' => $order->user->phone ?? 'N/A',
+                    'checked_in_at' => $order->checked_in_at->format('H:i'),
+                    'checked_in_date' => $order->checked_in_at->format('d/m/Y'),
+                    'total_amount' => number_format($order->total_amount, 0, ',', '.') . ' VND'
+                ];
+            });
+
+        return response()->json([
+            'success' => true,
+            'data' => $checkedInToday,
+            'count' => $checkedInToday->count()
+        ]);
+    }
+
+    /**
+     * Export checked-in list to PDF
+     */
+    public function exportPDF(Request $request)
+    {
+        try {
+            $date = $request->get('date', today()->format('Y-m-d'));
+            
+            $checkedInList = Order::whereNotNull('checked_in_at')
+                ->whereDate('checked_in_at', $date)
+                ->with('user')
+                ->orderBy('checked_in_at', 'asc')
+                ->get();
+
+            $pdf = Pdf::loadView('receptionist.checkin-pdf', [
+                'checkedInList' => $checkedInList,
+                'date' => $date,
+                'totalCount' => $checkedInList->count(),
+                'exportedAt' => now()->format('H:i d/m/Y')
+            ]);
+
+            return $pdf->download('danh-sach-checkin-' . $date . '.pdf');
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Lỗi xuất PDF: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+}

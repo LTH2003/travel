@@ -78,22 +78,9 @@
 
                     <div class="row">
                         <div class="col-12">
-                            <p class="text-muted mb-3"><strong>Phản hồi:</strong></p>
                             <form method="POST" action="{{ route('admin.contacts.update', $contact->id) }}">
                                 @csrf
                                 @method('PUT')
-                                
-                                <div class="mb-3">
-                                    <label for="response" class="form-label">Nội dung phản hồi</label>
-                                    <textarea class="form-control @error('response') is-invalid @enderror" 
-                                              id="response" name="response" rows="4" 
-                                              placeholder="Nhập phản hồi cho khách hàng..."
-                                              @if($contact->status === 'replied') readonly @endif>{{ old('response', $contact->response) }}</textarea>
-                                    @error('response')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-
                                 <div class="mb-3">
                                     <label for="status" class="form-label">Trạng thái</label>
                                     <select class="form-select @error('status') is-invalid @enderror" 
