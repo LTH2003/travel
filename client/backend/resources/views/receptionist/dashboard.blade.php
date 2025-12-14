@@ -150,10 +150,13 @@
             </div>
 
             <!-- Export Button -->
-            <div class="mb-3">
+            <div class="mb-3 d-flex gap-2">
                 <button type="button" class="btn btn-warning" id="exportPdfBtn">
                     <i class="bi bi-file-pdf"></i> Xuất PDF
                 </button>
+                <a href="{{ route('receptionist.history') }}" class="btn btn-info">
+                    <i class="bi bi-calendar-event"></i> Xem Lịch Sử
+                </a>
             </div>
 
             <!-- Check-in List -->

@@ -37,6 +37,14 @@ class Tour extends Model
     }
 
     /**
+     * Relationship: Booking details (orders) for this tour
+     */
+    public function bookingDetails()
+    {
+        return $this->hasMany(BookingDetail::class, 'bookable_id')->where('bookable_type', 'App\\Models\\Tour');
+    }
+
+    /**
      * Get approved reviews count
      */
     public function approvedReviewsCount()

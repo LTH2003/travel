@@ -11,7 +11,7 @@
         }
         
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'DejaVu Sans', 'Liberation Sans', sans-serif;
             font-size: 12px;
             color: #333;
             line-height: 1.4;

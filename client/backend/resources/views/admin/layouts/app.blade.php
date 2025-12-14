@@ -285,6 +285,24 @@
                     </li>
                 @endif
 
+                <!-- Tour Reviews - Admin only -->
+                @if(auth()->user()->role === 'admin')
+                    <li class="nav-item">
+                        <a href="{{ route('admin.tour-reviews.index') }}" class="nav-link {{ request()->routeIs('admin.tour-reviews.*') ? 'active' : '' }}">
+                            <i class="bi bi-star"></i> Đánh Giá Tour
+                        </a>
+                    </li>
+                @endif
+
+                <!-- Payment Management - Admin only -->
+                @if(auth()->user()->role === 'admin')
+                    <li class="nav-item">
+                        <a href="{{ route('admin.payments.index') }}" class="nav-link {{ request()->routeIs('admin.payments.*') ? 'active' : '' }}">
+                            <i class="bi bi-credit-card"></i> Thanh Toán
+                        </a>
+                    </li>
+                @endif
+
                 <!-- Contacts - Admin only -->
                 @if(auth()->user()->role === 'admin')
                     <li class="nav-item">

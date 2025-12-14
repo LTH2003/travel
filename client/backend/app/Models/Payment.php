@@ -27,6 +27,20 @@ class Payment extends Model
         'paid_at' => 'datetime',
     ];
 
+    /**
+     * Mock mode: Override status to 'success' for pending payments
+     */
+    protected $appends = ['display_status'];
+
+    public function getDisplayStatusAttribute()
+    {
+        // Nếu APP_PAYMENT_MOCK=true, hiển thị pending là success
+        if (env('APP_PAYMENT_MOCK', false) && $this->status === 'pending') {
+            return 'success';
+        }
+        return $this->status;
+    }
+
     // Relationships
     public function order()
     {

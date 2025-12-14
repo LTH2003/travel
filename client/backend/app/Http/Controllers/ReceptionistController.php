@@ -129,6 +129,9 @@ class ReceptionistController extends Controller
                 'totalCount' => $checkedInList->count(),
                 'exportedAt' => now()->format('H:i d/m/Y')
             ]);
+            
+            // Cấu hình DomPDF để hỗ trợ tiếng Việt
+            $pdf->getDomPDF()->getOptions()->set(['enable_utf8' => true, 'isPhpEnabled' => true]);
 
             return $pdf->download('danh-sach-checkin-' . $date . '.pdf');
         } catch (\Exception $e) {
@@ -136,6 +139,59 @@ class ReceptionistController extends Controller
                 'success' => false,
                 'message' => 'Lỗi xuất PDF: ' . $e->getMessage()
             ], 500);
+        }
+    }
+
+    /**
+     * Show check-in history page
+     */
+    public function history(Request $request)
+    {
+        $date = $request->query('date', today()->toDateString());
+        
+        $checkedInList = Order::whereNotNull('checked_in_at')
+            ->whereDate('checked_in_at', $date)
+            ->with('user')
+            ->orderBy('checked_in_at', 'desc')
+            ->get();
+
+        return view('receptionist.history', [
+            'checkedInList' => $checkedInList,
+            'selectedDate' => $date,
+            'totalCount' => $checkedInList->count()
+        ]);
+    }
+
+    /**
+     * Export check-in history as PDF for selected date
+     */
+    public function exportHistoryPDF(Request $request)
+    {
+        try {
+            $request->validate([
+                'date' => 'required|date_format:Y-m-d'
+            ]);
+
+            $date = $request->query('date', today()->toDateString());
+            $checkedInList = Order::whereNotNull('checked_in_at')
+                ->whereDate('checked_in_at', $date)
+                ->with('user')
+                ->orderBy('checked_in_at', 'asc')
+                ->get();
+
+            $pdf = Pdf::loadView('receptionist.checkin-pdf', [
+                'checkedInList' => $checkedInList,
+                'date' => $date,
+                'totalCount' => $checkedInList->count(),
+                'exportedAt' => now()->format('H:i d/m/Y')
+            ]);
+            
+            // Cấu hình DomPDF để hỗ trợ tiếng Việt
+            $pdf->getDomPDF()->getOptions()->set(['enable_utf8' => true, 'isPhpEnabled' => true]);
+
+            return $pdf->download('danh-sach-checkin-' . $date . '.pdf');
+        } catch (\Exception $e) {
+            return back()->withErrors('Lỗi xuất PDF: ' . $e->getMessage());
         }
     }
 }

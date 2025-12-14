@@ -54,12 +54,12 @@ export default function Tours() {
 
   // 🧩 Memoized lists derived from tours (only recalculate when tours change)
   const destinations = useMemo(
-    () => ["Tất cả điểm đến", ...Array.from(new Set(tours.map((t) => t.destination)))],
+    () => ["Tất cả điểm đến", ...Array.from(new Set(tours.map((t) => t.destination).filter(Boolean)))],
     [tours]
   );
 
   const categories = useMemo(
-    () => ["Tất cả", ...Array.from(new Set(tours.map((t) => t.category)))],
+    () => ["Tất cả", ...Array.from(new Set(tours.map((t) => t.category).filter(Boolean)))],
     [tours]
   );
 

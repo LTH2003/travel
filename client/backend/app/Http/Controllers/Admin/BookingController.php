@@ -166,6 +166,9 @@ class BookingController extends Controller
             'status' => $status,
             'export_date' => now()->format('d/m/Y H:i:s'),
         ]);
+        
+        // Cấu hình DomPDF để hỗ trợ tiếng Việt
+        $pdf->getDomPDF()->getOptions()->set(['enable_utf8' => true, 'isPhpEnabled' => true]);
 
         return $pdf->download('bookings-' . date('Y-m-d-His') . '.pdf');
     }

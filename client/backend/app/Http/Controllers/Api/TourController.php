@@ -8,10 +8,26 @@ use App\Http\Controllers\Controller;
 
 class TourController extends Controller
 {
-    // Lấy tất cả tour
+    // Lấy tất cả tour (sắp xếp theo số lượng order và rating)
     public function index()
     {
-        return response()->json(Tour::all());
+        $tours = Tour::withCount('bookingDetails as order_count')
+            ->orderByDesc('order_count')
+            ->orderByDesc('rating')
+            ->get()
+            ->map(function($tour) {
+                // Normalize category values
+                $normalizedCategory = $tour->category;
+                if (in_array(strtolower($tour->category), ['trong_nuoc', 'trong nước'])) {
+                    $normalizedCategory = 'Trong nước';
+                } elseif (in_array(strtolower($tour->category), ['quoc_te', 'quốc tế'])) {
+                    $normalizedCategory = 'Quốc tế';
+                }
+                $tour->category = $normalizedCategory;
+                return $tour;
+            });
+        
+        return response()->json($tours);
     }
 
     // Lấy tour theo ID

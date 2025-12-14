@@ -280,8 +280,17 @@ class PaymentController extends Controller
                 'transaction_id' => $transactionId,
                 'amount' => $order->total_amount,
                 'payment_method' => 'momo',
-                'status' => 'pending',
+                'status' => env('APP_PAYMENT_MOCK', false) ? 'success' : 'pending',
+                'paid_at' => env('APP_PAYMENT_MOCK', false) ? now() : null,
             ]);
+
+            // Auto-complete order if in mock mode
+            if (env('APP_PAYMENT_MOCK', false)) {
+                $order->update([
+                    'status' => 'completed',
+                    'completed_at' => now(),
+                ]);
+            }
 
             // Tạo request MoMo
             $momoResult = $this->momoService->createPayment(
@@ -351,8 +360,17 @@ class PaymentController extends Controller
                 'transaction_id' => $transactionId,
                 'amount' => $order->total_amount,
                 'payment_method' => 'vietqr',
-                'status' => 'pending',
+                'status' => env('APP_PAYMENT_MOCK', false) ? 'success' : 'pending',
+                'paid_at' => env('APP_PAYMENT_MOCK', false) ? now() : null,
             ]);
+
+            // Auto-complete order if in mock mode
+            if (env('APP_PAYMENT_MOCK', false)) {
+                $order->update([
+                    'status' => 'completed',
+                    'completed_at' => now(),
+                ]);
+            }
 
             // Tạo QR code
             $qrResult = $this->vietqrService->generateQRCode(
@@ -530,8 +548,17 @@ class PaymentController extends Controller
                 'transaction_id' => $transactionId,
                 'amount' => $order->total_amount,
                 'payment_method' => 'zalopay',
-                'status' => 'pending',
+                'status' => env('APP_PAYMENT_MOCK', false) ? 'success' : 'pending',
+                'paid_at' => env('APP_PAYMENT_MOCK', false) ? now() : null,
             ]);
+
+            // Auto-complete order if in mock mode
+            if (env('APP_PAYMENT_MOCK', false)) {
+                $order->update([
+                    'status' => 'completed',
+                    'completed_at' => now(),
+                ]);
+            }
 
             // Gọi ZaloPay service để tạo order QuickLink
             $result = $this->zalopayService->createOrderQuicklink(
@@ -756,8 +783,17 @@ class PaymentController extends Controller
                 'transaction_id' => $transactionId,
                 'amount' => $order->total_amount,
                 'payment_method' => 'card',
-                'status' => 'pending',
+                'status' => env('APP_PAYMENT_MOCK', false) ? 'success' : 'pending',
+                'paid_at' => env('APP_PAYMENT_MOCK', false) ? now() : null,
             ]);
+
+            // Auto-complete order if in mock mode
+            if (env('APP_PAYMENT_MOCK', false)) {
+                $order->update([
+                    'status' => 'completed',
+                    'completed_at' => now(),
+                ]);
+            }
 
             // Tạo Payment Intent
             $cardResult = $this->cardService->createPaymentIntent(
@@ -904,9 +940,18 @@ class PaymentController extends Controller
                 'transaction_id' => $transactionId,
                 'amount' => $order->total_amount,
                 'payment_method' => 'ewallet',
-                'status' => 'pending',
+                'status' => env('APP_PAYMENT_MOCK', false) ? 'success' : 'pending',
+                'paid_at' => env('APP_PAYMENT_MOCK', false) ? now() : null,
                 'request_id' => $walletType, // Lưu loại e-wallet
             ]);
+
+            // Auto-complete order if in mock mode
+            if (env('APP_PAYMENT_MOCK', false)) {
+                $order->update([
+                    'status' => 'completed',
+                    'completed_at' => now(),
+                ]);
+            }
 
             $result = null;
 
