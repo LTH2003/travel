@@ -154,6 +154,9 @@
                 <button type="button" class="btn btn-warning" id="exportPdfBtn">
                     <i class="bi bi-file-pdf"></i> Xuất PDF
                 </button>
+                <button type="button" class="btn btn-success" id="exportInvoiceBtn">
+                    <i class="bi bi-receipt"></i> Xuất Hóa Đơn Thanh Toán
+                </button>
                 <a href="{{ route('receptionist.history') }}" class="btn btn-info">
                     <i class="bi bi-calendar-event"></i> Xem Lịch Sử
                 </a>
@@ -470,9 +473,139 @@ document.addEventListener('DOMContentLoaded', function() {
         window.location.href = '{{ route("receptionist.exportPDF") }}?date=' + today;
     });
 
+    // Export Invoice functionality
+    const exportInvoiceBtn = document.getElementById('exportInvoiceBtn');
+    const invoiceModal = new bootstrap.Modal(document.getElementById('invoiceModal'));
+    
+    exportInvoiceBtn.addEventListener('click', async function() {
+        try {
+            const response = await fetch('{{ route("receptionist.getCheckedInForInvoice") }}');
+            const data = await response.json();
+            
+            if (data.success) {
+                const invoiceList = document.getElementById('invoiceSelectList');
+                
+                if (data.data.length === 0) {
+                    invoiceList.innerHTML = '<p class="text-muted text-center">Không có đơn hàng để xuất hóa đơn</p>';
+                } else {
+                    invoiceList.innerHTML = data.data.map(order => `
+                        <div class="invoice-item card mb-2">
+                            <div class="card-body p-3">
+                                <div class="form-check">
+                                    <input class="form-check-input invoice-checkbox" type="radio" 
+                                           name="invoiceSelect" value="${order.id}" 
+                                           id="invoice_${order.id}">
+                                    <label class="form-check-label w-100" for="invoice_${order.id}">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div>
+                                                <strong>${order.customer_name}</strong><br>
+                                                <small class="text-muted">Mã: ${order.order_code}</small>
+                                            </div>
+                                            <div class="text-end">
+                                                <div><strong>${order.total_amount}</strong></div>
+                                                <small class="text-muted">${order.checked_in_at}</small>
+                                            </div>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+                
+                invoiceModal.show();
+            } else {
+                showMessage('Lỗi: ' + data.message, 'danger');
+            }
+        } catch (error) {
+            console.error('Lỗi tải danh sách:', error);
+            showMessage('Lỗi tải danh sách đơn hàng', 'danger');
+        }
+    });
+
+    // Confirm export invoice
+    const confirmExportBtn = document.getElementById('confirmExportInvoiceBtn');
+    confirmExportBtn.addEventListener('click', async function() {
+        const selectedOrderId = document.querySelector('input[name="invoiceSelect"]:checked')?.value;
+        
+        if (!selectedOrderId) {
+            showMessage('Vui lòng chọn đơn hàng', 'warning');
+            return;
+        }
+
+        confirmExportBtn.disabled = true;
+        confirmExportBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Đang xử lý...';
+
+        try {
+            const response = await fetch(`{{ url('receptionist/export-invoice') }}/${selectedOrderId}`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                showMessage(data.message, 'success');
+                invoiceModal.hide();
+                // Refresh the list after export
+                setTimeout(refreshCheckInList, 1000);
+            } else {
+                showMessage(data.message || 'Lỗi xuất hóa đơn', 'danger');
+            }
+        } catch (error) {
+            console.error('Lỗi xuất hóa đơn:', error);
+            showMessage('Lỗi xuất hóa đơn', 'danger');
+        } finally {
+            confirmExportBtn.disabled = false;
+            confirmExportBtn.innerHTML = '<i class="bi bi-check-circle"></i> Xác Nhận Xuất';
+        }
+    });
+
     // Auto-refresh list every 30 seconds
     setInterval(refreshCheckInList, 30000);
 });
 </script>
+
+<!-- Modal Xuất Hóa Đơn -->
+<div class="modal fade" id="invoiceModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title">
+                    <i class="bi bi-receipt"></i> Xuất Hóa Đơn Thanh Toán
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label"><strong>Chọn đơn hàng để xuất hóa đơn:</strong></label>
+                    <div id="invoiceSelectList" style="max-height: 400px; overflow-y: auto;">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Đang tải...</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="alert alert-info mb-0">
+                    <small>
+                        <i class="bi bi-info-circle"></i> 
+                        Hóa đơn sẽ được tạo và gửi email cho khách hàng
+                    </small>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-success" id="confirmExportInvoiceBtn">
+                    <i class="bi bi-check-circle"></i> Xác Nhận Xuất
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<meta name="csrf-token" content="{{ csrf_token() }}">
 </body>
 </html>

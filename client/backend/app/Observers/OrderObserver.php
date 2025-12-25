@@ -13,11 +13,7 @@ use Endroid\QrCode\Writer\PngWriter;
 
 class OrderObserver
 {
-    /**
-     * Handle the Order "updated" event.
-     * Send email when order status changes to completed
-     * Update room availability when order is completed or cancelled
-     */
+
     public function updated(Order $order): void
     {
         \Log::info('OrderObserver.updated() called', ['order_id' => $order->id, 'status' => $order->status]);
@@ -37,7 +33,7 @@ class OrderObserver
                 \Log::info('Calling decreaseAvailableRooms', ['order_id' => $order->id]);
                 $this->decreaseAvailableRooms($order);
                 
-                // Create purchase history records
+
                 \Log::info('Creating purchase history', ['order_id' => $order->id]);
                 $this->createPurchaseHistory($order);
                 
@@ -57,13 +53,11 @@ class OrderObserver
         }
     }
 
-    /**
-     * Send booking confirmation email
-     */
+
     private function sendBookingEmail(Order $order): void
     {
         try {
-            // Get booking details
+
             $bookingDetails = BookingDetail::where('order_id', $order->id)->get();
             
             if ($bookingDetails->isEmpty()) {
@@ -71,10 +65,9 @@ class OrderObserver
                 return;
             }
 
-            // Generate QR code
             $qrCode = $this->generateQrCode($order);
 
-            // Prepare booking information
+
             $bookingInfo = [];
             foreach ($bookingDetails as $detail) {
                 $itemName = 'Unknown';
@@ -165,13 +158,12 @@ class OrderObserver
                     'bookable_id' => $detail->bookable_id,
                 ]);
 
-                // Nếu loại bookable là Room
                 if ($detail->bookable_type === 'App\Models\Room' || $detail->bookable_type === 'Room') {
                     \Log::info('🏠 Handling Room type', ['detail_id' => $detail->id]);
                     $room = Room::find($detail->bookable_id);
                     
                     if ($room) {
-                        // Trừ đi số phòng đã đặt
+                        
                         $newAvailable = max(0, $room->available - $detail->quantity);
                         $room->update(['available' => $newAvailable]);
                         
@@ -215,7 +207,7 @@ class OrderObserver
                         ]);
 
                         if ($roomName) {
-                            // Tìm phòng của hotel này theo tên
+                            
                             $room = Room::where('hotel_id', $hotel->id)
                                 ->where('name', $roomName)
                                 ->first();
@@ -228,7 +220,7 @@ class OrderObserver
                             ]);
 
                             if ($room) {
-                                // Trừ đi số phòng đã đặt
+                                
                                 $newAvailable = max(0, $room->available - $quantity);
                                 $room->update(['available' => $newAvailable]);
                                 $room->refresh();

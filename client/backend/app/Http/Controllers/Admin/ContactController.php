@@ -16,12 +16,12 @@ class ContactController extends Controller
     {
         $query = Contact::with('user');
 
-        // Filter by status
+
         if ($request->filled('status')) {
             $query->where('status', $request->get('status'));
         }
 
-        // Search by name or email
+
         if ($request->filled('search')) {
             $search = $request->get('search');
             $query->where(function ($q) use ($search) {
@@ -32,7 +32,7 @@ class ContactController extends Controller
 
         $contacts = $query->orderBy('created_at', 'desc')->paginate(15);
 
-        // Calculate stats
+
         $stats = [
             'total' => Contact::count(),
             'new' => Contact::where('status', 'new')->count(),

@@ -14,14 +14,14 @@ class RoomController extends Controller
         return response()->json(Room::findOrFail($id));
     }
 
-    // Admin: Get all rooms for a hotel
+    
     public function indexByHotel($hotelId)
     {
         $hotel = Hotel::findOrFail($hotelId);
         return response()->json($hotel->rooms);
     }
 
-    // Admin: Create room
+    
     public function store(Request $request, $hotelId)
     {
         $hotel = Hotel::findOrFail($hotelId);
@@ -45,7 +45,7 @@ class RoomController extends Controller
         return response()->json($room, 201);
     }
 
-    // Admin: Update room
+    
     public function update(Request $request, $hotelId, $roomId)
     {
         $hotel = Hotel::findOrFail($hotelId);
@@ -69,7 +69,7 @@ class RoomController extends Controller
         return response()->json($room);
     }
 
-    // Admin: Delete room
+    
     public function destroy($hotelId, $roomId)
     {
         $hotel = Hotel::findOrFail($hotelId);

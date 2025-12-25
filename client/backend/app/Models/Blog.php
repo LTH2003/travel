@@ -10,18 +10,9 @@ class Blog extends Model
     use HasFactory;
 
     protected $fillable = [
-        'title',
-        'slug',
-        'excerpt',
-        'content',
-        'author',
-        'category',
-        'tags',
-        'image',
-        'published_at',
-        'read_time',
-        'views',
-        'likes',
+        'title', 'slug', 'excerpt', 'content',
+        'author','category','tags','image',
+        'published_at','read_time','views','likes',
     ];
 
     protected $casts = [

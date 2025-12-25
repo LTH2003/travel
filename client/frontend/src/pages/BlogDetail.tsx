@@ -34,15 +34,13 @@ export default function BlogDetail() {
   useEffect(() => {
     setLoading(true);
     setError(null);
-    // Reset flag khi slug thay đổi
+    
     viewIncrementedRef.current = false;
 
-    // Get current user from localStorage
     const token = localStorage.getItem("token");
     if (token) {
       try {
-        // You can optionally fetch user data from API
-        // For now, we'll assume token existence means user is logged in
+
         setCurrentUser({ logged_in: true });
       } catch (err) {
         console.warn("Could not load user:", err);
@@ -57,7 +55,6 @@ export default function BlogDetail() {
         if (currentPost) {
           setPost(currentPost);
 
-          // 📈 Tăng view count chỉ một lần duy nhất khi xem bài viết
           if (!viewIncrementedRef.current) {
             viewIncrementedRef.current = true;
             blogApi.incrementViewBySlug(slug).catch((err) => {
@@ -112,7 +109,7 @@ export default function BlogDetail() {
     });
   };
 
-  // 🕐 Loading state
+  
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">

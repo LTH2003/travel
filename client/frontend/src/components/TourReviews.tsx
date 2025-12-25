@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Star, MessageSquare, Edit2, Trash2 } from 'lucide-react';
+import { Star, MessageSquare, Edit2, Trash2, Heart } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { tourReviewApi } from '@/api/tourReviewApi';

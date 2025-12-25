@@ -12,7 +12,7 @@ use App\Services\OtpService;
 
 class AuthController extends Controller
 {
-    // 🧩 Đăng ký tài khoản
+    //  Đăng ký tài khoản
     public function register(Request $request)
     {
         $validated = $request->validate([
@@ -38,7 +38,7 @@ class AuthController extends Controller
         ], 201);
     }
 
-    // 🧩 Đăng nhập tài khoản
+    //  Đăng nhập tài khoản
     public function login(Request $request)
     {
         $credentials = $request->validate([
@@ -79,7 +79,7 @@ class AuthController extends Controller
         ]);
     }
 
-    // 🧩 Lấy thông tin user đang đăng nhập
+    //  Lấy thông tin user đang đăng nhập
     public function me(Request $request)
     {
         return response()->json([

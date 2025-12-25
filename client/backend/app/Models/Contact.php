@@ -11,16 +11,9 @@ class Contact extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id',
-        'name',
-        'email',
-        'phone',
-        'subject',
-        'message',
-        'status',
-        'response',
-        'responded_by',
-        'responded_at',
+        'user_id','name','email','phone',
+        'subject','message','status','response',
+        'responded_by','responded_at',
     ];
 
     protected $casts = [

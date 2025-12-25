@@ -25,13 +25,12 @@ export default function Index() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // 🧭 Gọi API để lấy tour nổi bật
+
   useEffect(() => {
     const fetchTours = async () => {
       try {
         setLoading(true);
-        const res = await tourApi.getAll(); // hoặc .getAll()
-        // Normalize the response safely since the API return type may be unknown
+        const res = await tourApi.getAll(); 
         const payload = (res as any)?.data ?? res;
         const tours = (payload as any)?.data ?? payload ?? [];
         setFeaturedTours(Array.isArray(tours) ? tours : []);

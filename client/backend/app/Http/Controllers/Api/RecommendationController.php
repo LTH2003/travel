@@ -17,7 +17,6 @@ class RecommendationController extends Controller
     {
         $user = $request->user();
         
-        // Get user's favorite hotels and tours
         $favorites = Favorite::where('user_id', $user->id)->with('favoritable')->get();
         
         $favoriteHotels = $favorites
@@ -30,7 +29,6 @@ class RecommendationController extends Controller
             ->map(fn($f) => $f->favoritable)
             ->toArray();
         
-        // If no favorites, return popular items
         if (count($favoriteHotels) === 0 && count($favoriteTours) === 0) {
             return response()->json([
                 'recommended_hotels' => Hotel::with('rooms')->orderBy('rating', 'desc')->limit(6)->get(),
@@ -39,25 +37,21 @@ class RecommendationController extends Controller
             ]);
         }
         
-        // Analyze user preferences
         $hotelLocations = collect($favoriteHotels)->pluck('location')->toArray();
         $tourDestinations = collect($favoriteTours)->pluck('destination')->toArray();
         $avgHotelPrice = collect($favoriteHotels)->avg('price') ?? 0;
         $avgTourPrice = collect($favoriteTours)->avg('price') ?? 0;
         
-        // Get all hotels and tours
         $allHotels = Hotel::with('rooms')->get();
         $allTours = Tour::all();
         
-        // Score hotels based on similarity
         $scoredHotels = $allHotels->map(function ($hotel) use ($favoriteHotels, $avgHotelPrice, $hotelLocations) {
             $score = 0;
             
-            // 1. Location similarity (40 points)
+            // 1. giống địa điểm (40 điểm)
             if (in_array($hotel->location, $hotelLocations)) {
                 $score += 40;
             } else {
-                // Partial match on location keywords
                 foreach ($hotelLocations as $favLocation) {
                     if (stripos($hotel->location, explode(' ', $favLocation)[0]) !== false) {
                         $score += 15;
@@ -65,7 +59,7 @@ class RecommendationController extends Controller
                 }
             }
             
-            // 2. Price range similarity (30 points)
+            // 2. giá tương tự (30 points)
             if ($avgHotelPrice > 0) {
                 $priceDiff = abs($hotel->price - $avgHotelPrice) / $avgHotelPrice;
                 if ($priceDiff < 0.2) {
@@ -77,10 +71,10 @@ class RecommendationController extends Controller
                 }
             }
             
-            // 3. Rating (20 points)
+            // 3. sô sao danh gia (20 points)
             $score += $hotel->rating * 4;
             
-            // 4. Filter out already favorited
+            // 4. loại trừ đi các ks đã thích
             if (in_array($hotel->id, collect($favoriteHotels)->pluck('id')->toArray())) {
                 $score = 0;
             }

@@ -8,7 +8,7 @@ use App\Http\Controllers\Controller;
 
 class TourController extends Controller
 {
-    // Lấy tất cả tour (sắp xếp theo số lượng order và rating)
+    
     public function index()
     {
         $tours = Tour::withCount('bookingDetails as order_count')
@@ -16,7 +16,7 @@ class TourController extends Controller
             ->orderByDesc('rating')
             ->get()
             ->map(function($tour) {
-                // Normalize category values
+                
                 $normalizedCategory = $tour->category;
                 if (in_array(strtolower($tour->category), ['trong_nuoc', 'trong nước'])) {
                     $normalizedCategory = 'Trong nước';

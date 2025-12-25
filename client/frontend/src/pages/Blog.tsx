@@ -43,13 +43,12 @@ export default function Blog() {
       .then(() => setLoading(false));
   }, []);
 
-  // 🧩 Lấy danh mục từ dữ liệu API (memoized)
   const categories = useMemo(
     () => ["Tất cả", ...Array.from(new Set(blogs.map((b) => b.category)))],
     [blogs]
   );
 
-  // 🧮 Filter & Sort (memoized - only recalculate when dependencies change)
+  
   const filteredPosts = useMemo(() => {
     return blogs
       .filter((post) => {

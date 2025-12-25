@@ -26,7 +26,6 @@ export default function Footer() {
               <li><a href="/tours" className="hover:text-white transition">Tour trong nước</a></li>
               <li><a href="/tours" className="hover:text-white transition">Tour quốc tế</a></li>
               <li><a href="/hotels" className="hover:text-white transition">Đặt khách sạn</a></li>
-              <li><a href="/tours" className="hover:text-white transition">Vé máy bay</a></li>
             </ul>
           </div>
           

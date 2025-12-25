@@ -22,7 +22,7 @@ interface SearchFormProps {
 }
 
 export default function SearchForm({ onSearch, className }: SearchFormProps) {
-  const [destination, setDestination] = useState('');
+  const [destination, setDestination] = useState('Tất cả điểm đến');
   const [departure, setDeparture] = useState<Date>();
   const [guests, setGuests] = useState(2);
   const [keyword, setKeyword] = useState('');

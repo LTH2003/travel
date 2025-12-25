@@ -35,7 +35,7 @@ export interface Tour {
 export default function Tours() {
   useTitle("Tours - TravelVN");
   const [searchParams, setSearchParams] = useSearchParams();
-  const ITEMS_PER_PAGE = 12; // Show 12 tours per page
+  const ITEMS_PER_PAGE = 9; // Show 9 tours per page
 
   const [tours, setTours] = useState<Tour[]>([]);
   const [filteredTours, setFilteredTours] = useState<Tour[]>([]);
@@ -63,7 +63,7 @@ export default function Tours() {
     [tours]
   );
 
-  // Pagination
+
   const totalPages = Math.ceil(filteredTours.length / ITEMS_PER_PAGE);
   const startIdx = (currentPage - 1) * ITEMS_PER_PAGE;
   const endIdx = startIdx + ITEMS_PER_PAGE;
@@ -72,7 +72,6 @@ export default function Tours() {
   const formatPrice = (value: number) =>
     new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND", maximumFractionDigits: 0 }).format(value);
 
-  // ✅ Gọi API để lấy danh sách tour
   useEffect(() => {
     const fetchTours = async () => {
       try {
@@ -90,7 +89,7 @@ export default function Tours() {
     fetchTours();
   }, []);
 
-  // ✅ Lọc & sắp xếp (memoized - only recalculate when dependencies change)
+
   useEffect(() => {
     let filtered = [...tours];
 
@@ -151,18 +150,24 @@ export default function Tours() {
     }
 
     setFilteredTours(filtered);
-    setCurrentPage(1); // Reset to page 1 when filters change
+    setCurrentPage(1); 
   }, [tours, selectedDestination, selectedCategory, priceRange, selectedDurations, sortBy, keyword]);
 
   const handleSearch = (filters: SearchFilters) => {
     const newSearchParams = new URLSearchParams();
 
-    if (filters.destination && filters.destination !== "Tất cả điểm đến") {
+    // Nếu chọn "Tất cả điểm đến" thì reset destination
+    if (!filters.destination || filters.destination === "Tất cả điểm đến") {
+      setSelectedDestination("Tất cả điểm đến");
+    } else {
       newSearchParams.set("destination", filters.destination);
       setSelectedDestination(filters.destination);
     }
 
-    if (filters.keyword) {
+    // Reset keyword nếu không có, hoặc set keyword mới
+    if (!filters.keyword) {
+      setKeyword("");
+    } else {
       newSearchParams.set("keyword", filters.keyword);
       setKeyword(filters.keyword);
     }

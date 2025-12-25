@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
+use App\Services\InvoiceService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -62,9 +63,14 @@ class ReceptionistController extends Controller
             $order->checked_in_at = now();
             $order->save();
 
+            // Auto-generate and send invoice
+            $invoiceService = new InvoiceService();
+            $invoiceResult = $invoiceService->generateAndSendInvoice($order);
+
             return response()->json([
                 'success' => true,
                 'message' => 'Check-in thành công cho ' . $order->user->name,
+                'invoice' => $invoiceResult,
                 'order' => [
                     'id' => $order->id,
                     'order_code' => $order->order_code,
@@ -194,4 +200,89 @@ class ReceptionistController extends Controller
             return back()->withErrors('Lỗi xuất PDF: ' . $e->getMessage());
         }
     }
+
+    /**
+     * Get today's checked-in orders for invoice export selection
+     */
+    public function getCheckedInForInvoice()
+    {
+        try {
+            $checkedInToday = Order::whereNotNull('checked_in_at')
+                ->whereDate('checked_in_at', today())
+                ->with('user')
+                ->orderBy('checked_in_at', 'desc')
+                ->get()
+                ->map(function ($order) {
+                    return [
+                        'id' => $order->id,
+                        'order_code' => $order->order_code,
+                        'customer_name' => $order->user->name,
+                        'customer_email' => $order->user->email,
+                        'checked_in_at' => $order->checked_in_at->format('H:i d/m/Y'),
+                        'total_amount' => number_format($order->total_amount, 0, ',', '.') . ' VND'
+                    ];
+                });
+
+            return response()->json([
+                'success' => true,
+                'data' => $checkedInToday,
+                'count' => $checkedInToday->count()
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Lỗi: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Export invoice for a specific order
+     */
+    public function exportInvoice(Request $request, $orderId)
+    {
+        try {
+            // Validate orderId from route parameter
+            if (!$orderId || !is_numeric($orderId)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Mã đơn hàng không hợp lệ'
+                ], 422);
+            }
+
+            $order = Order::with('user', 'bookingDetails')->find($orderId);
+
+            if (!$order) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Không tìm thấy đơn hàng'
+                ], 404);
+            }
+
+            // Check if order was checked in today
+            if (!$order->checked_in_at || $order->checked_in_at->toDateString() !== today()->toDateString()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Chỉ có thể xuất hóa đơn cho các đơn check-in hôm nay'
+                ], 422);
+            }
+
+            // Use InvoiceService to generate and send invoice
+            $invoiceService = new InvoiceService();
+            $result = $invoiceService->generateAndSendInvoice($order);
+
+            return response()->json([
+                'success' => $result['success'],
+                'pdfGenerated' => $result['pdfGenerated'],
+                'emailSent' => $result['emailSent'],
+                'message' => $result['message']
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Lỗi: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }
+

@@ -109,5 +109,8 @@ Route::middleware(['auth', 'receptionist'])->group(function () {
     Route::get('receptionist/history', [ReceptionistController::class, 'history'])->name('receptionist.history');
     Route::get('receptionist/export-pdf', [ReceptionistController::class, 'exportPDF'])->name('receptionist.exportPDF');
     Route::get('receptionist/export-history-pdf', [ReceptionistController::class, 'exportHistoryPDF'])->name('receptionist.exportHistoryPDF');
+    // Invoice export routes
+    Route::get('receptionist/checked-in-for-invoice', [ReceptionistController::class, 'getCheckedInForInvoice'])->name('receptionist.getCheckedInForInvoice');
+    Route::post('receptionist/export-invoice/{orderId}', [ReceptionistController::class, 'exportInvoice'])->name('receptionist.exportInvoice');
 });
 

@@ -28,81 +28,78 @@ use App\Http\Controllers\Api\TourReviewController;
 |--------------------------------------------------------------------------
 */
 
-// 🌐 Public routes (không cần token)
+
 Route::get('/blog', [BlogController::class, 'index']);
 Route::get('/blog/{id}', [BlogController::class, 'show']);
 Route::post('/blog/{id}/increment-view', [BlogController::class, 'incrementView']); // 📈 Tăng view
 Route::post('/blog/slug/{slug}/increment-view', [BlogController::class, 'incrementViewBySlug']); // 📈 Tăng view theo slug
 
-// 📝 Blog Comments routes (public GET, protected POST/PUT/DELETE)
+
 Route::get('/blog-comments/{blogId}', [BlogCommentController::class, 'getComments']);
 Route::get('/blog-comments/slug/{slug}', [BlogCommentController::class, 'getCommentsBySlug']);
 
 Route::get('/tours', [TourController::class, 'index']);
 Route::get('/tours/{id}', [TourController::class, 'show']);
 
-// ⭐ Tour Reviews routes (public GET)
+
 Route::get('/tours/{tourId}/reviews', [TourReviewController::class, 'getReviews']);
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
-// 2FA routes (public)
+
 Route::post('/auth/verify-otp', [AuthController::class, 'verifyOtp']);
 Route::post('/auth/resend-otp', [AuthController::class, 'resendOtp']);
 
-// Note: Development-only debug routes (test-token, debug-order) removed.
-// These were gated by APP_DEBUG and have been deleted to clean the codebase.
 
-// 📧 Contact routes (requires authentication)
+
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/contacts', [ContactController::class, 'store']);
 });
 
 
-// 🔐 Protected routes (cần đăng nhập)
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/me', [AuthController::class, 'me']);
     Route::get('/profile', [AuthController::class, 'me']);
     Route::put('/profile', [AuthController::class, 'updateProfile']);
     
-    // 2FA routes (protected)
+    
     Route::post('/auth/enable-2fa', [AuthController::class, 'enableTwoFactor']);
     Route::post('/auth/confirm-2fa', [AuthController::class, 'confirmTwoFactor']);
     Route::post('/auth/disable-2fa', [AuthController::class, 'disableTwoFactor']);
     
-    // Cart routes
+    
     Route::get('/cart', [CartController::class, 'show']);
     Route::post('/cart', [CartController::class, 'store']);
     Route::delete('/cart', [CartController::class, 'destroy']);
     
-    // Favorite routes
+    
     Route::get('/favorites', [FavoriteController::class, 'index']);
     Route::post('/favorites', [FavoriteController::class, 'store']);
     Route::delete('/favorites', [FavoriteController::class, 'destroy']);
     Route::post('/favorites/check', [FavoriteController::class, 'check']);
     
-    // 📝 Blog Comments routes (protected)
+    
     Route::post('/blog-comments/{blogId}', [BlogCommentController::class, 'store']);
     Route::put('/blog-comments/{commentId}', [BlogCommentController::class, 'update']);
     Route::delete('/blog-comments/{commentId}', [BlogCommentController::class, 'destroy']);
     
-    // ⭐ Tour Reviews routes (protected)
+    
     Route::post('/tours/{tourId}/reviews', [TourReviewController::class, 'store']);
     Route::put('/reviews/{reviewId}', [TourReviewController::class, 'update']);
     Route::delete('/reviews/{reviewId}', [TourReviewController::class, 'destroy']);
     
-    // Recommendation routes
+    
     Route::get('/recommendations', [RecommendationController::class, 'getRecommendations']);
     
-    // 💳 Payment routes
+
     Route::post('/orders', [PaymentController::class, 'createOrder']); // ✅ Tạo đơn hàng (cần auth)
     Route::get('/checkout-info', [PaymentController::class, 'getCheckoutInfo']);
     Route::get('/payment-methods', [PaymentController::class, 'getPaymentMethods']);
     
     // MoMo
-        // POST-only API. Add GET handler to return JSON 405 for accidental browser visits.
+        
         Route::get('/payment/momo/initiate', function () {
             return response()->json([
                 'status' => false,
@@ -112,7 +109,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/payment/momo/initiate', [PaymentController::class, 'initiateMoMoPayment']);
     
     // VietQR
-    // Add GET handlers to return JSON 405 for accidental browser navigation
+    
     Route::get('/payment/vietqr/initiate', function () {
         return response()->json([
             'status' => false,
@@ -120,9 +117,9 @@ Route::middleware('auth:sanctum')->group(function () {
         ], 405);
     });
     Route::post('/payment/vietqr/initiate', [PaymentController::class, 'initiateVietQRPayment']);
-    // Server-side proxy to fetch QR image (avoids CORS/404 for client)
+    
     Route::get('/payment/vietqr/proxy/{orderId}', function ($orderId, Request $request) {
-        // Require auth and owner check
+        
         $user = $request->user();
         $order = \App\Models\Order::find($orderId);
         if (!$order) {
@@ -132,7 +129,7 @@ Route::middleware('auth:sanctum')->group(function () {
             return response()->json(['status' => false, 'message' => 'Unauthorized'], 403);
         }
 
-        // Use the VietQR service to build the qrUrl
+        
         $vietqr = app(\App\Services\VietQRPaymentService::class);
         $qrResult = $vietqr->generateQRCode($order->order_code, $order->total_amount, 'Thanh toán don hang ' . $order->order_code);
 
@@ -152,7 +149,7 @@ Route::middleware('auth:sanctum')->group(function () {
             return response()->json(['status' => false, 'message' => $e->getMessage()], 422);
         }
     });
-    // Server-side generator: create QR image via api.qrserver.com and return binary
+    
     Route::get('/payment/vietqr/image/{orderId}', function ($orderId, Request $request) {
         $user = $request->user();
         $order = \App\Models\Order::find($orderId);
@@ -166,8 +163,7 @@ Route::middleware('auth:sanctum')->group(function () {
         $vietqr = app(\App\Services\VietQRPaymentService::class);
         $qrResult = $vietqr->generateQRCode($order->order_code, $order->total_amount, 'Thanh toán don hang ' . $order->order_code);
 
-        // Choose data to encode: prefer EMV payload (emvPayload) for bank apps,
-        // otherwise fall back to qrUrl or encoded qrData JSON
+        
         $dataToEncode = $qrResult['emvPayload'] ?? $qrResult['qrUrl'] ?? json_encode($qrResult['qrData'] ?? $qrResult);
 
         try {
@@ -185,7 +181,6 @@ Route::middleware('auth:sanctum')->group(function () {
             return response()->json(['status' => false, 'message' => $e->getMessage()], 422);
         }
     });
-    // Server-side Data-URL generator: return JSON with base64 data URI for frontend embedding
     Route::get('/payment/vietqr/datauri/{orderId}', function ($orderId, Request $request) {
         $user = $request->user();
         $order = \App\Models\Order::find($orderId);
@@ -204,8 +199,7 @@ Route::middleware('auth:sanctum')->group(function () {
         }
 
         try {
-            // Generate QR locally using endroid/qr-code
-            // Prefer EMV payload if available so bank apps receive correct format
+            
             $payload = $qrResult['emvPayload'] ?? $qrResult['qrUrl'];
             $builder = \Endroid\QrCode\Builder\Builder::create()
                 ->data($payload)
@@ -226,7 +220,7 @@ Route::middleware('auth:sanctum')->group(function () {
             return response()->json(['status' => false, 'message' => $e->getMessage()], 422);
         }
     });
-    // Server-side QuickLink generator (builds img.vietqr.io URL and returns dataUri)
+    
     Route::get('/payment/vietqr/quicklink/{orderId}', function ($orderId, Request $request) {
         $user = $request->user();
         $order = \App\Models\Order::find($orderId);
@@ -240,7 +234,7 @@ Route::middleware('auth:sanctum')->group(function () {
         $vietqr = app(\App\Services\VietQRPaymentService::class);
         $qrResult = $vietqr->generateQRCode($order->order_code, $order->total_amount, 'Thanh toán don hang ' . $order->order_code);
 
-        // Build QuickLink URL using available data. Note: ensure your config provides the correct bank identifier expected by vietqr (e.g., numeric code like 970415)
+        
         $bankId = $qrResult['bankCode'] ?? $vietqr->getBankInfo()['bankCode'] ?? '';
         $accountNo = $qrResult['accountNumber'] ?? $vietqr->getBankInfo()['accountNumber'] ?? '';
         $template = 'compact2';
@@ -279,7 +273,7 @@ Route::middleware('auth:sanctum')->group(function () {
             return response()->json(['status' => false, 'message' => $e->getMessage()], 422);
         }
     });
-    // Server-side payload endpoint: return a payload string that frontend can encode into a QR
+    
     Route::get('/payment/vietqr/payload/{orderId}', function ($orderId, Request $request) {
         $user = $request->user();
         $order = \App\Models\Order::find($orderId);
@@ -297,7 +291,7 @@ Route::middleware('auth:sanctum')->group(function () {
             return response()->json(['status' => false, 'message' => 'QR data not available'], 422);
         }
 
-        // Prefer returning a compact payload string (EMV payload) for client-side QR generation
+        
         $payload = $qrResult['emvPayload'] ?? $qrResult['qrUrl'] ?? json_encode($qrResult['qrData']);
 
         return response()->json([
@@ -338,11 +332,11 @@ Route::get('/hotels/{id}', [HotelController::class, 'show']);
 
 Route::get('/rooms/{id}', [RoomController::class, 'show']);
 
-// 🔐 Public Payment Callbacks (Webhooks)
+
 Route::post('/payment/momo/callback', [PaymentController::class, 'momoCallback']);
 Route::post('/payment/zalopay/callback', [PaymentController::class, 'zalopayCallback']);
 
-// 🔐 Admin routes for Hotels and Rooms
+
 Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     // Hotel admin routes
     Route::post('/hotels', [HotelController::class, 'store']);
@@ -384,4 +378,10 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
 
 // 🔓 Public booking verification (no auth needed)
 Route::get('/bookings/verify/{orderId}', [BookingController::class, 'verifyBooking']);
+
+// 🏨 Receptionist Routes (check-in with automatic invoice generation)
+Route::middleware(['auth:sanctum', 'receptionist'])->group(function () {
+    Route::post('/receptionist/check-in', [App\Http\Controllers\ReceptionistController::class, 'checkIn']);
+    Route::get('/receptionist/checked-in-list', [App\Http\Controllers\ReceptionistController::class, 'getCheckedInList']);
+});
 
